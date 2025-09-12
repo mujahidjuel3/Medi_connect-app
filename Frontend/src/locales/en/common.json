@@ -1,0 +1,21 @@
+{
+  "app_name": "Prescripto",
+  "login": "Login",
+  "logout": "Logout",
+  "book_appointment": "Book Appointment",
+  "upload_prescription": "Upload Prescription",
+  "chat_with_doctor": "Chat with Doctor",
+  "language": "Language",
+  "english": "English",
+  "bangla": "Bangla",
+  "home": "HOME",
+  "all_doctors": "ALL DOCTORS",
+  "about": "ABOUT",
+  "contact": "CONTACT",
+  "my_profile": "My Profile",
+  "my_appointments": "My Appointments",
+  "logout_btn": "Logout",
+  "book_title_line1": "Book Appointment",
+  "book_title_line2": "With Trusted Doctors",
+  "header_subtext": "Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free."
+}
