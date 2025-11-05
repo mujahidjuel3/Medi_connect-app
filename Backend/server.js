@@ -22,20 +22,42 @@ import prescriptionRoutes from "./routes/prescriptionRoutes.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
-// DB Connections
-connectDB();          // ✅ MongoDB connect
-connectCloudinary();  // ✅ Cloudinary connect
-
 // ------------------ Middlewares ------------------ //
+// CORS must be before other middlewares
+app.use(cors({
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      process.env.CORS_ORIGIN,
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000'
+    ].filter(Boolean);
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all for development
+    }
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','token', 'atoken', 'dtoken', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({
-  origin: [process.env.CORS_ORIGIN, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean),
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','token']
-}));
+
+// DB Connections
+connectDB();          // ✅ MongoDB connect
+connectCloudinary();  // ✅ Cloudinary connect
 
 // ------------------ Razorpay ------------------ //
 export const razorpay = new Razorpay({
@@ -59,7 +81,10 @@ app.get("/", (_req, res) => {
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: process.env.CORS_ORIGIN, credentials: true },
+  cors: { 
+    origin: [process.env.CORS_ORIGIN, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean),
+    credentials: true 
+  },
 });
 
 io.use((socket, next) => {
@@ -99,8 +124,19 @@ io.on("connection", (socket) => {
 app.set("io", io); 
 
 // ------------------ Server Listen ------------------ //
-server.listen(port, () => console.log(`🚀 Server running on port ${port}`));
+server.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
+  console.log(`📡 CORS enabled for: http://localhost:5173, http://localhost:5174`);
+});
 
-// API Routes
-app.use('/api/admin', adminRouter);
-app.use('/api/doctor', doctorRouter);
+// Handle server errors
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} is already in use. Please kill the process using this port.`);
+    console.error(`💡 Run: netstat -ano | findstr :${port} to find the process`);
+    process.exit(1);
+  } else {
+    console.error('❌ Server error:', error);
+    process.exit(1);
+  }
+});

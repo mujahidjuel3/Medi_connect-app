@@ -14,7 +14,12 @@ const authAdmin = async (req, res, next) => {
 
     const token_decode = jwt.verify(atoken, process.env.JWT_SECRET);
 
-    if (token_decode !== process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD) {
+    // Token is signed as email + password, so verify it matches
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const expectedTokenData = adminEmail + adminPassword;
+
+    if (token_decode !== expectedTokenData) {
       return res.json({
         success: false,
         message: "Not Authorized Login Again",
@@ -24,7 +29,7 @@ const authAdmin = async (req, res, next) => {
     next();
   } catch (error) {
     console.log("error:", error);
-    res.json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message || "Authentication failed" });
   }
 };
 

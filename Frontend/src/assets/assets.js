@@ -25,6 +25,7 @@ import contact_image from "./contact_image.png";
 import menu_icon from "./menu_icon.svg";
 import cross_icon from "./cross_icon.png";
 import upload_icon from "./upload_icon.png";
+import chats_icon from "./chats_icon.svg";
 
 import Dermatologist from "./Dermatologist.svg";
 import Gastroenterologist from "./Gastroenterologist.svg";
@@ -46,6 +47,7 @@ export const assets = {
   menu_icon,
   upload_area,
   upload_icon,
+  chats_icon,
   home_icon,
   patients_icon,
   people_icon,

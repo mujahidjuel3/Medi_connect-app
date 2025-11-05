@@ -10,6 +10,8 @@ import MyAppointments from "./pages/MyAppointments";
 import Appointment from "./pages/Appointment";
 import Navbar from "./components/Navbar";
 import Contact from "./pages/Contact";
+import Chat from "./pages/Chat";
+import Prescription from "./pages/Prescription";
 import Footer from "./components/Footer";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./context/AppContext";
@@ -34,6 +36,8 @@ const App = () => {
           <Route path="/my-profile" element={<MyProfile />}></Route>
           <Route path="/my-appointments" element={<MyAppointments />}></Route>
           <Route path="/appointment/:docId" element={<Appointment />}></Route>
+          <Route path="/chat" element={<Chat />}></Route>
+          <Route path="/prescription" element={<Prescription />}></Route>
           <Route path="*" element={<div>Not found</div>} />
         </Routes>
         <Footer />

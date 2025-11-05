@@ -39,6 +39,27 @@ const Navbar = () => {
           <li className="py-1 ">{t('contact')}</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
+        {/* Chat and Prescription buttons - visible when logged in */}
+        {token && userData && (
+          <>
+            <button
+              onClick={() => navigate("/chat")}
+              className="flex items-center gap-2 py-1 hover:text-primary transition-colors"
+              title="Chat with Doctor"
+            >
+              <img src={assets.chats_icon} className="w-5 h-5" alt="Chat" />
+              <span className="hidden lg:inline">Chat</span>
+            </button>
+            <button
+              onClick={() => navigate("/prescription")}
+              className="flex items-center gap-2 py-1 hover:text-primary transition-colors"
+              title="Upload Prescription"
+            >
+              <img src={assets.upload_icon} className="w-5 h-5" alt="Prescription" />
+              <span className="hidden lg:inline">Prescription</span>
+            </button>
+          </>
+        )}
       </ul>
       <div className="flex items-center gap-4">
         <LanguageSwitcher />
@@ -47,22 +68,38 @@ const Navbar = () => {
             <img className="w-8 h-8 rounded-full" src={userData.image} alt="" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
             <div className="absolute top-0 right-0  pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4 ">
+              <div className="min-w-48 bg-white shadow-lg border border-gray-200 rounded-lg flex flex-col gap-2 p-3 ">
                 <p
                   onClick={() => navigate("/my-profile")}
-                  className=" hover:text-black cursor-pointer"
+                  className=" hover:bg-gray-100 cursor-pointer px-3 py-2 rounded"
                 >
                   My Profile
                 </p>
                 <p
                   onClick={() => navigate("/my-appointments")}
-                  className=" hover:text-black  cursor-pointer"
+                  className=" hover:bg-gray-100  cursor-pointer px-3 py-2 rounded"
                 >
                   My Appointment
                 </p>
+                <hr className="border-gray-200" />
+                <p
+                  onClick={() => navigate("/chat")}
+                  className=" hover:bg-gray-100  cursor-pointer flex items-center gap-2 px-3 py-2 rounded"
+                >
+                  <img src={assets.chats_icon} className="w-4 h-4" alt="" />
+                  Chat with Doctor
+                </p>
+                <p
+                  onClick={() => navigate("/prescription")}
+                  className=" hover:bg-gray-100  cursor-pointer flex items-center gap-2 px-3 py-2 rounded"
+                >
+                  <img src={assets.upload_icon} className="w-4 h-4" alt="" />
+                  Upload Prescription
+                </p>
+                <hr className="border-gray-200" />
                 <p
                   onClick={logout}
-                  className=" hover:text-black  cursor-pointer"
+                  className=" hover:bg-red-50 hover:text-red-600 cursor-pointer px-3 py-2 rounded"
                 >
                   Logout
                 </p>
@@ -119,6 +156,31 @@ const Navbar = () => {
             <NavLink onClick={() => setShowMenu(false)} to="/contact">
               <p className="px-4 py-2 rounded inline-block">{t('contact')}</p>
             </NavLink>
+            {/* Chat and Prescription for mobile - visible when logged in */}
+            {token && userData && (
+              <>
+                <button
+                  onClick={() => {
+                    navigate("/chat");
+                    setShowMenu(false);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded inline-block"
+                >
+                  <img src={assets.chats_icon} className="w-5 h-5" alt="Chat" />
+                  <span>Chat with Doctor</span>
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/prescription");
+                    setShowMenu(false);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded inline-block"
+                >
+                  <img src={assets.upload_icon} className="w-5 h-5" alt="Prescription" />
+                  <span>Upload Prescription</span>
+                </button>
+              </>
+            )}
           </ul>
         </div>
       </div>

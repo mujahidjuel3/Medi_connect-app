@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import MoveUpOnRender from "../components/MoveUpOnRender";
+import { assets } from "../assets/assets";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
@@ -198,6 +199,26 @@ const MyAppointments = () => {
                 <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500 ">
                   Completed
                 </button>
+              )}
+              
+              {/* Chat and Prescription buttons */}
+              {!item.cancelled && (
+                <>
+                  <button
+                    onClick={() => navigate(`/chat?doctorId=${item.docData?._id}`)}
+                    className="text-sm text-center sm:min-w-48 py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <img src={assets.chats_icon} className="w-4 h-4" alt="" />
+                    Chat
+                  </button>
+                  <button
+                    onClick={() => navigate(`/prescription?appointmentId=${item._id}`)}
+                    className="text-sm text-center sm:min-w-48 py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <img src={assets.upload_icon} className="w-4 h-4" alt="" />
+                    Prescription
+                  </button>
+                </>
               )}
             </div>
           </div>

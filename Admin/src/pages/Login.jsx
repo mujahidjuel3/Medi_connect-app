@@ -2,7 +2,8 @@ import { useContext, useState } from "react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { DoctorContext } from "../context/DontorContext";
+import { DoctorContext } from "../context/DoctorContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [state, setState] = useState("Admin");
@@ -10,39 +11,54 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { setAToken, backendUrl } = useContext(AdminContext);
   const { setDToken } = useContext(DoctorContext);
+  const navigate = useNavigate();
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
     try {
       if (state === "Admin") {
+        console.log("Attempting admin login to:", backendUrl + "/api/admin/login");
         const { data } = await axios.post(backendUrl + "/api/admin/login", {
           email,
           password,
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
         if (data.success) {
           localStorage.setItem("aToken", data.token);
           setAToken(data.token);
+          toast.success("Admin login successful!");
+          navigate("/admin-dashboard");
         } else {
           toast.error(data.message);
         }
       } else {
+        console.log("Attempting doctor login to:", backendUrl + "/api/doctor/login");
         const { data } = await axios.post(backendUrl + "/api/doctor/login", {
           email,
           password,
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
         if (data.success) {
           localStorage.setItem("dToken", data.token);
           setDToken(data.token);
-          console.log("data.token:", data.token);
+          toast.success("Doctor login successful!");
+          navigate("/doctor-dashboard");
         } else {
           toast.error(data.message);
         }
       }
     } catch (error) {
       console.log("error:", error);
+      toast.error(error.response?.data?.message || error.message || "Login failed. Please try again.");
     }
   };
   return (

@@ -104,7 +104,8 @@ const AdminContextProvider = (props) => {
       toast.error(error);
     }
   };
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  console.log("Admin Backend URL:", backendUrl);
   const value = {
     aToken,
     setAToken,

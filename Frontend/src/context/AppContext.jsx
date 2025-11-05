@@ -6,7 +6,7 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
   const currencySymbol = "$";
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
   const [isLoading, setIsLoading] = useState(false);
   console.log("isLoading:", isLoading);
   const [doctors, setDoctors] = useState([]);

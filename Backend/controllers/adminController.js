@@ -109,18 +109,22 @@ const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (
-      email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
+    if (!email || !password) {
+      return res.json({ success: false, message: "Email and password are required" });
+    }
+
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+    if (email === adminEmail && password === adminPassword) {
       const token = jwt.sign(email + password, process.env.JWT_SECRET);
       res.json({ success: true, token });
     } else {
-      res.json({ success: false, message: "Invalid credential" });
+      res.json({ success: false, message: "Invalid credentials. Please check your email and password." });
     }
   } catch (error) {
     console.log("error:", error);
-    res.json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message || "Login failed" });
   }
 };
 

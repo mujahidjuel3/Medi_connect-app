@@ -1,6 +1,6 @@
 import streamifier from 'streamifier';
 import Prescription from '../models/Prescription.js';
-import cloudinary from '../config/cloudinary.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 export const uploadPrescription = async (req, res, next) => {
   try {
