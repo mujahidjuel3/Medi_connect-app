@@ -3,7 +3,7 @@ import { AdminContext } from "../../context/AdminContext";
 import MoveUpOnRender from "../../components/MoveUpOnRender";
 
 const DoctorsList = () => {
-  const { doctors, aToken, getAllDoctors, changeAvailability } =
+  const { doctors, aToken, getAllDoctors, changeAvailability, deleteDoctor } =
     useContext(AdminContext);
 
   useEffect(() => {
@@ -33,13 +33,21 @@ const DoctorsList = () => {
                 </p>
                 <p className="text-zinc-600 text-sm ">{item.speciality}</p>
 
-                <div className="mt-5 flex items-center gap-1 text-sm">
-                  <input
-                    onChange={() => changeAvailability(item._id)}
-                    type="checkbox"
-                    checked={item.available}
-                  />
-                  <p>Available</p>
+                <div className="mt-5 flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-sm">
+                    <input
+                      onChange={() => changeAvailability(item._id)}
+                      type="checkbox"
+                      checked={item.available}
+                    />
+                    <p>Available</p>
+                  </div>
+                  <button
+                    onClick={() => deleteDoctor(item._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>

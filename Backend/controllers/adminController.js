@@ -21,6 +21,11 @@ const addDoctor = async (req, res) => {
     } = req.body;
     const imageFile = req.file;
 
+    //checking for image file
+    if (!imageFile) {
+      return res.json({ success: false, message: "Doctor image is required" });
+    }
+
     //checking for all data to add doctor
     if (
       !name ||
@@ -33,7 +38,7 @@ const addDoctor = async (req, res) => {
       !fees ||
       !address
     ) {
-      return res.json({ success: false, message: "missing details" });
+      return res.json({ success: false, message: "All fields are required" });
     }
 
     // validatin email format
@@ -49,19 +54,30 @@ const addDoctor = async (req, res) => {
     if (password.length < 8) {
       return res.json({
         success: false,
-        message: "Please enter a strong password",
+        message: "Please enter a strong password (minimum 8 characters)",
       });
     }
 
-    //check user existed
-    const existedUser = await doctorModel.findOne({
-      $or: [{ name }, { email }],
+    // Normalize email for comparison (trim and lowercase)
+    const normalizedEmail = email.trim().toLowerCase();
+
+    //check if doctor with this email already exists (case-insensitive check)
+    // First try direct match (for already normalized emails)
+    let existedDoctor = await doctorModel.findOne({
+      email: normalizedEmail,
     });
 
-    if (existedUser) {
+    // If not found, check case-insensitively (for old data that might have different cases)
+    if (!existedDoctor) {
+      existedDoctor = await doctorModel.findOne({
+        email: { $regex: new RegExp(`^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
+      });
+    }
+
+    if (existedDoctor) {
       return res.status(409).json({
         success: false,
-        message: "Docter with email already exists",
+        message: "Doctor with this email already exists",
       });
     }
 
@@ -70,24 +86,42 @@ const addDoctor = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // upload image cloudinary
+    let imageUrl;
+    try {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+        resource_type: "image",
+      });
+      imageUrl = imageUpload.secure_url;
+    } catch (cloudinaryError) {
+      console.log("Cloudinary upload error:", cloudinaryError);
+      return res.json({
+        success: false,
+        message: "Failed to upload image. Please try again.",
+      });
+    }
 
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-      resource_type: "image",
-    });
-
-    const imageUrl = imageUpload.secure_url;
+    // Parse address safely
+    let parsedAddress;
+    try {
+      parsedAddress = typeof address === "string" ? JSON.parse(address) : address;
+    } catch (parseError) {
+      return res.json({
+        success: false,
+        message: "Invalid address format",
+      });
+    }
 
     const doctorData = {
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail, // Use already normalized email
       image: imageUrl,
       password: hashedPassword,
       speciality,
-      degree,
+      degree: degree.trim(),
       experience,
-      about,
-      fees,
-      address: JSON.parse(address),
+      about: about.trim(),
+      fees: Number(fees),
+      address: parsedAddress,
       date: Date.now(),
     };
 
@@ -96,11 +130,33 @@ const addDoctor = async (req, res) => {
     await newDoctor.save();
     res.json({
       success: true,
-      message: "doctor added",
+      message: "Doctor added successfully",
     });
   } catch (error) {
-    console.log("error:", error);
-    res.json({ success: false, message: error.message });
+    console.log("Add doctor error:", error);
+    
+    // Handle specific MongoDB duplicate key error
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0] || "email";
+      return res.status(409).json({
+        success: false,
+        message: `Doctor with this ${field} already exists`,
+      });
+    }
+
+    // Handle validation errors
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors || {}).map((e) => e.message);
+      return res.status(400).json({
+        success: false,
+        message: errors.join(", ") || "Validation error",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to add doctor. Please try again.",
+    });
   }
 };
 
@@ -201,6 +257,38 @@ const adminDashboard = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+
+// API to delete doctor
+const deleteDoctor = async (req, res) => {
+  try {
+    const { docId } = req.body;
+
+    if (!docId) {
+      return res.json({ success: false, message: "Doctor ID is required" });
+    }
+
+    // Check if doctor exists
+    const doctor = await doctorModel.findById(docId);
+    if (!doctor) {
+      return res.json({ success: false, message: "Doctor not found" });
+    }
+
+    // Cancel all appointments for this doctor
+    await appointmentModel.updateMany(
+      { docId, cancelled: false },
+      { cancelled: true }
+    );
+
+    // Delete the doctor
+    await doctorModel.findByIdAndDelete(docId);
+
+    res.json({ success: true, message: "Doctor deleted successfully" });
+  } catch (error) {
+    console.log("error:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   addDoctor,
   loginAdmin,
@@ -208,4 +296,5 @@ export {
   appointmentsAdmin,
   appointmentCancel,
   adminDashboard,
+  deleteDoctor,
 };

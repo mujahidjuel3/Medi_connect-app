@@ -11,6 +11,12 @@ import Razorpay from "razorpay";
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 
+// Import models to ensure they're registered
+import userModel from "./models/userModel.js";
+import doctorModel from "./models/doctorModel.js";
+import Conversation from "./models/Conversation.js";
+import Message from "./models/Message.js";
+
 // Routes
 import adminRouter from "./routes/adminRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
@@ -89,14 +95,27 @@ const io = new Server(server, {
 
 io.use((socket, next) => {
   try {
-    const token =
+    // Try to get token from different sources (user token, doctor token)
+    const userToken =
       socket.handshake.auth?.token ||
       (socket.handshake.headers.authorization || "").split(" ")[1];
-    if (!token) return next();
+    
+    const doctorToken = socket.handshake.auth?.dToken || socket.handshake.auth?.dtoken;
+    
+    let token = userToken || doctorToken;
+    
+    if (!token) {
+      return next();
+    }
+    
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    socket.user = { id: payload.id, role: payload.role };
+    socket.user = { 
+      id: payload.id, 
+      role: payload.role || (doctorToken ? "doctor" : "user")
+    };
     next();
   } catch (e) {
+    // Allow connection even if token verification fails (for guest users)
     next();
   }
 });
@@ -106,14 +125,72 @@ io.on("connection", (socket) => {
 
   socket.on("chat:join", (conversationId) => socket.join(conversationId));
 
-  socket.on("chat:message", async ({ conversationId, text }) => {
-    const { default: Message } = await import("./models/Message.js");
-    const msg = await Message.create({
-      conversation: conversationId,
-      sender: socket.user?.id ?? "guest",
-      text,
-    });
-    io.to(conversationId).emit("chat:message", msg);
+  socket.on("chat:message", async ({ conversationId, text, senderRole }, callback) => {
+    try {
+      const { default: Message } = await import("./models/Message.js");
+      const senderId = socket.user?.id;
+      const role = senderRole || socket.user?.role || "user";
+      
+      if (!senderId) {
+        const error = { error: "Authentication required" };
+        socket.emit("error", error);
+        if (callback) callback(error);
+        return;
+      }
+
+      if (!conversationId || !text?.trim()) {
+        const error = { error: "Conversation ID and text are required" };
+        socket.emit("error", error);
+        if (callback) callback(error);
+        return;
+      }
+
+      const msg = await Message.create({
+        conversation: conversationId,
+        sender: senderId,
+        senderModel: role === "doctor" ? "doctor" : "user",
+        senderRole: role,
+        text: text.trim(),
+      });
+      
+      // Update conversation lastMessageAt
+      const { default: Conversation } = await import("./models/Conversation.js");
+      await Conversation.findByIdAndUpdate(conversationId, {
+        lastMessageAt: new Date(),
+      });
+      
+      // Populate sender info before emitting
+      // Use the correct model name based on senderModel
+      let populatedMsg;
+      if (msg.senderModel === "doctor") {
+        populatedMsg = await Message.findById(msg._id)
+          .populate({
+            path: "sender",
+            model: "doctor",
+            select: "name email image"
+          })
+          .lean();
+      } else {
+        populatedMsg = await Message.findById(msg._id)
+          .populate({
+            path: "sender",
+            model: "user",
+            select: "name email image"
+          })
+          .lean();
+      }
+      
+      // Emit to all clients in the conversation room
+      io.to(conversationId).emit("chat:message", populatedMsg || msg);
+      
+      // Send success acknowledgement
+      if (callback) callback({ success: true, message: populatedMsg || msg });
+    } catch (error) {
+      console.error("Chat message error:", error);
+      const errorResponse = { error: error.message || "Failed to send message" };
+      socket.emit("error", errorResponse);
+      if (callback) callback(errorResponse);
+    }
   });
 
   socket.on("typing", (conversationId) => {

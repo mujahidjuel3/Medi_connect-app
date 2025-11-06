@@ -20,6 +20,7 @@ const initialValues = {
 const AddDoctor = () => {
   const [docImg, setDocImg] = useState(false);
   const [doctorData, setDoctorData] = useState(initialValues);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     //const name = e.target.name
@@ -32,34 +33,64 @@ const AddDoctor = () => {
     });
   };
 
-  const { backendUrl, aToken } = useContext(AdminContext);
+  const { backendUrl, aToken, getAllDoctors, getDashData } = useContext(AdminContext);
 
   const handleOnSubmit = async (event) => {
     event.preventDefault(); // not reload funtion
 
+    // Prevent multiple submissions
+    if (isLoading) {
+      return;
+    }
+
     try {
+      // Validation
       if (!docImg) {
-        return toast.error("Image not selected");
+        return toast.error("Please select a doctor image");
       }
+
+      // Validate required fields
+      if (
+        !doctorData.name?.trim() ||
+        !doctorData.email?.trim() ||
+        !doctorData.password ||
+        !doctorData.degree?.trim() ||
+        !doctorData.address1?.trim() ||
+        !doctorData.address2?.trim() ||
+        !doctorData.about?.trim() ||
+        !doctorData.fees
+      ) {
+        return toast.error("Please fill in all required fields");
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(doctorData.email.trim())) {
+        return toast.error("Please enter a valid email address");
+      }
+
+      // Validate password length
+      if (doctorData.password.length < 8) {
+        return toast.error("Password must be at least 8 characters long");
+      }
+
+      setIsLoading(true);
       const formData = new FormData();
 
-      if (!docImg) {
-        return toast.error("Image not selected");
-      }
       formData.append("image", docImg);
-      formData.append("name", doctorData.name);
-      formData.append("email", doctorData.email);
+      formData.append("name", doctorData.name.trim());
+      formData.append("email", doctorData.email.trim());
       formData.append("password", doctorData.password);
       formData.append("experience", doctorData.experience);
       formData.append("fees", Number(doctorData.fees));
-      formData.append("about", doctorData.about);
+      formData.append("about", doctorData.about.trim());
       formData.append("speciality", doctorData.speciality);
-      formData.append("degree", doctorData.degree);
+      formData.append("degree", doctorData.degree.trim());
       formData.append(
         "address",
         JSON.stringify({
-          line1: doctorData.address1,
-          line2: doctorData.address2,
+          line1: doctorData.address1.trim(),
+          line2: doctorData.address2.trim(),
         })
       );
 
@@ -68,19 +99,39 @@ const AddDoctor = () => {
         formData,
         {
           headers: { aToken },
+          onUploadProgress: (progressEvent) => {
+            // Optional: Show upload progress
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            console.log(`Upload Progress: ${percentCompleted}%`);
+          },
         }
       );
 
       if (data.success) {
-        toast.success(data.message);
+        toast.success(data.message || "Doctor added successfully!");
         setDocImg(null);
         setDoctorData(initialValues);
+        // Reset file input
+        const fileInput = document.getElementById("doc-img");
+        if (fileInput) {
+          fileInput.value = "";
+        }
+        getAllDoctors();
+        getDashData();
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to add doctor");
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to add doctor. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -263,9 +314,40 @@ const AddDoctor = () => {
 
           <button
             type="submit"
-            className="bg-primary px-10 py-3 mt-4 text-white rounded-full"
+            disabled={isLoading}
+            className={`bg-primary px-10 py-3 mt-4 text-white rounded-full transition-all duration-200 ${
+              isLoading
+                ? "opacity-70 cursor-not-allowed"
+                : "hover:bg-primary/90 hover:scale-105"
+            }`}
           >
-            Add Doctor
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Adding Doctor...
+              </span>
+            ) : (
+              "Add Doctor"
+            )}
           </button>
         </div>
       </form>
