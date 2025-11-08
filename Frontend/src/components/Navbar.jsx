@@ -45,18 +45,18 @@ const Navbar = () => {
             <button
               onClick={() => navigate("/chat")}
               className="flex items-center gap-2 py-1 hover:text-primary transition-colors"
-              title="Chat with Doctor"
+              title={t('chat_with_doctor')}
             >
               <img src={assets.chats_icon} className="w-5 h-5" alt="Chat" />
-              <span className="hidden lg:inline">Chat</span>
+              <span className="hidden lg:inline">{t('chat')}</span>
             </button>
             <button
               onClick={() => navigate("/prescription")}
               className="flex items-center gap-2 py-1 hover:text-primary transition-colors"
-              title="Upload Prescription"
+              title={t('upload_prescription')}
             >
               <img src={assets.upload_icon} className="w-5 h-5" alt="Prescription" />
-              <span className="hidden lg:inline">Prescription</span>
+              <span className="hidden lg:inline">{t('prescription')}</span>
             </button>
           </>
         )}
@@ -73,13 +73,13 @@ const Navbar = () => {
                   onClick={() => navigate("/my-profile")}
                   className=" hover:bg-gray-100 cursor-pointer px-3 py-2 rounded"
                 >
-                  My Profile
+                  {t('my_profile')}
                 </p>
                 <p
                   onClick={() => navigate("/my-appointments")}
                   className=" hover:bg-gray-100  cursor-pointer px-3 py-2 rounded"
                 >
-                  My Appointment
+                  {t('my_appointments')}
                 </p>
                 <hr className="border-gray-200" />
                 <p
@@ -87,21 +87,21 @@ const Navbar = () => {
                   className=" hover:bg-gray-100  cursor-pointer flex items-center gap-2 px-3 py-2 rounded"
                 >
                   <img src={assets.chats_icon} className="w-4 h-4" alt="" />
-                  Chat with Doctor
+                  {t('chat_with_doctor')}
                 </p>
                 <p
                   onClick={() => navigate("/prescription")}
                   className=" hover:bg-gray-100  cursor-pointer flex items-center gap-2 px-3 py-2 rounded"
                 >
                   <img src={assets.upload_icon} className="w-4 h-4" alt="" />
-                  Upload Prescription
+                  {t('upload_prescription')}
                 </p>
                 <hr className="border-gray-200" />
                 <p
                   onClick={logout}
                   className=" hover:bg-red-50 hover:text-red-600 cursor-pointer px-3 py-2 rounded"
                 >
-                  Logout
+                  {t('logout_btn')}
                 </p>
               </div>
             </div>
@@ -112,7 +112,7 @@ const Navbar = () => {
               onClick={() => navigate("/login")}
               className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block"
             >
-              Create Account
+              {t('create_account')}
             </button>
           </>
         )}
@@ -167,7 +167,7 @@ const Navbar = () => {
                   className="flex items-center gap-2 px-4 py-2 rounded inline-block"
                 >
                   <img src={assets.chats_icon} className="w-5 h-5" alt="Chat" />
-                  <span>Chat with Doctor</span>
+                  <span>{t('chat_with_doctor')}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -177,7 +177,7 @@ const Navbar = () => {
                   className="flex items-center gap-2 px-4 py-2 rounded inline-block"
                 >
                   <img src={assets.upload_icon} className="w-5 h-5" alt="Prescription" />
-                  <span>Upload Prescription</span>
+                  <span>{t('upload_prescription')}</span>
                 </button>
               </>
             )}

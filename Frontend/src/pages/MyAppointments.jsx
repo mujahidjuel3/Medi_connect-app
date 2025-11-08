@@ -5,9 +5,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import MoveUpOnRender from "../components/MoveUpOnRender";
 import { assets } from "../assets/assets";
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
+  const { t } = useTranslation();
   const [appointments, setAppointments] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
@@ -134,7 +137,7 @@ const MyAppointments = () => {
   return (
     <div>
       <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
-        My appointments
+        {t('my_appointments_title')}
       </p>
 
       <MoveUpOnRender id="my-appointments">
@@ -152,15 +155,17 @@ const MyAppointments = () => {
             </div>
             <div className="flex-1 text-sm text-zinc-500">
               <p className="text-neutral-800 font-semibold">
-                {item?.docData?.name}
+                {i18n.language === 'bn' && item?.docData?.nameBn ? item?.docData?.nameBn : item?.docData?.name}
               </p>
-              <p>{item?.docData?.speciality}</p>
-              <p className="text-zinc-700 font-medium mt-1">Address:</p>
+              <p>
+                {i18n.language === 'bn' && item?.docData?.specialityBn ? item?.docData?.specialityBn : item?.docData?.speciality}
+              </p>
+              <p className="text-zinc-700 font-medium mt-1">{t('address')}:</p>
               <p className="text-xs">{item?.docData?.address?.line1}</p>
               <p className="text-xs">{item?.docData?.address?.line1}</p>
               <p className="text-xs mt-1">
                 <span className="text-sm text-neutral-700 font-medium">
-                  Date & Time :
+                  {t('date_time')}
                 </span>
                 {slotDateFormat(item?.slotDate)} | {item.slotTime}
               </p>
@@ -170,7 +175,7 @@ const MyAppointments = () => {
             <div className="flex flex-col gap-2 justify-end">
               {!item.cancelled && item.payment && !item.isCompleted && (
                 <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border bg-indigo-50">
-                  Paid
+                  {t('paid')}
                 </button>
               )}
               {!item.cancelled && !item.payment && !item.isCompleted && (
@@ -178,7 +183,7 @@ const MyAppointments = () => {
                   onClick={() => appointmentRazorpay(item?._id)}
                   className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-primary hover:text-white tranisal duration-300"
                 >
-                  Pay Online
+                  {t('pay_online')}
                 </button>
               )}
               {!item.cancelled && !item.isCompleted && (
@@ -186,18 +191,18 @@ const MyAppointments = () => {
                   onClick={() => cancelAppointment(item._id)}
                   className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white tranisal duration-300"
                 >
-                  Cancel Appointment
+                  {t('cancel_appointment')}
                 </button>
               )}
 
               {item.cancelled && !item.isCompleted && (
                 <button className="sm:min-w-48 py-2 border border-red-500 rounded tex-red-500">
-                  Appointment cancelled
+                  {t('appointment_cancelled')}
                 </button>
               )}
               {item.isCompleted && (
                 <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500 ">
-                  Completed
+                  {t('completed')}
                 </button>
               )}
               
@@ -209,14 +214,14 @@ const MyAppointments = () => {
                     className="text-sm text-center sm:min-w-48 py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <img src={assets.chats_icon} className="w-4 h-4" alt="" />
-                    Chat
+                    {t('chat')}
                   </button>
                   <button
                     onClick={() => navigate(`/prescription?appointmentId=${item._id}`)}
                     className="text-sm text-center sm:min-w-48 py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     <img src={assets.upload_icon} className="w-4 h-4" alt="" />
-                    Prescription
+                    {t('prescription')}
                   </button>
                 </>
               )}

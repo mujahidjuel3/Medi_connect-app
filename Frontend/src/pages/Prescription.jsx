@@ -1,15 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PrescriptionUpload from "../components/prescription/PrescriptionUpload";
 import { assets } from "../assets/assets";
 import MoveUpOnRender from "../components/MoveUpOnRender";
 import axios from "axios";
+import { useTranslation } from 'react-i18next';
 
 const Prescription = () => {
   const { token, userData, backendUrl } = useContext(AppContext);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(() => {
     // Load selected doctor from localStorage
@@ -18,12 +20,12 @@ const Prescription = () => {
 
   useEffect(() => {
     if (!token || !userData) {
-      toast.warn("Please login to upload prescription");
+      toast.warn(t('please_login'));
       navigate("/login");
       return;
     }
     fetchDoctors();
-  }, [token, userData, navigate]);
+  }, [token, userData, navigate, t]);
 
   // Save selected doctor to localStorage
   useEffect(() => {
@@ -61,7 +63,7 @@ const Prescription = () => {
             alt="Prescription"
           />
           <h1 className="text-2xl font-semibold text-gray-800">
-            Upload Prescription
+            {t('upload_prescription')}
           </h1>
         </div>
 
@@ -69,7 +71,7 @@ const Prescription = () => {
           <div>
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Doctor <span className="text-red-500">*</span>
+                {t('select_doctor')} <span className="text-red-500">*</span>
               </label>
               <select
                 className="w-full border border-gray-300 rounded-lg px-4 py-2"
@@ -79,7 +81,7 @@ const Prescription = () => {
                 }
                 required
               >
-                <option value="">Select a doctor</option>
+                <option value="">{t('select_doctor_required')}</option>
                 {doctors.map((doc) => (
                   <option key={doc._id} value={doc._id}>
                     {doc.name} - {doc.speciality}
@@ -90,7 +92,7 @@ const Prescription = () => {
 
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold mb-4">
-                Upload Prescription File
+                {t('upload_prescription_file')}
               </h3>
               <PrescriptionUpload
                 doctorId={selectedDoctor || undefined}

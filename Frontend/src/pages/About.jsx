@@ -1,13 +1,15 @@
 import { assets } from "../assets/assets";
 import MoveUpOnRender from "../components/MoveUpOnRender";
+import { useTranslation } from 'react-i18next';
 
 const About = () => {
+  const { t } = useTranslation();
   return (
     <MoveUpOnRender id="about">
       <div>
         <div className="text-center text-2xl pt-10 text-gray-600">
           <p>
-            About <span className="text-gray-700 font-medium">US</span>
+            {t('about')} <span className="text-gray-700 font-medium">{t('about_us')}</span>
           </p>
         </div>
 
@@ -20,54 +22,40 @@ const About = () => {
           />
           <div className="flex flex-col justify-center gap-6 md:w-2/4 text-sm text-gray-600">
             <p>
-              Welcome to Prescripto, your trusted partner in managing your
-              healthcare needs conveniently and efficiently. At Prescripto, we
-              understand the challenges individuals face when it comes to
-              scheduling doctor appointments and managing their health records.
+              {t('welcome_prescripto')}
             </p>
             <p>
-              Prescripto is committed to excellence in healthcare technology. We
-              continuously strive to enhance our platform, integrating the
-              latest advancements to improve user experience and deliver
-              superior service. Whether you're booking your first appointment or
-              managing ongoing care, Prescripto is here to support you every
-              step of the way.
+              {t('prescripto_commitment')}
             </p>
-            <b className="text-gray-800">Our Vision</b>
+            <b className="text-gray-800">{t('our_vision')}</b>
             <p>
-              Our vision at Prescripto is to create a seamless healthcare
-              experience for every user. We aim to bridge the gap between
-              patients and healthcare providers, making it easier for you to
-              access the care you need, when you need it.
+              {t('vision_text')}
             </p>
           </div>
         </div>
 
         <div className="text-xl my-4 ">
           <p>
-            Why <span className="text-gray-700 font-semibold">Choose Us</span>
+            {t('why_choose_us')}
           </p>
 
           <div className="flex flex-col md:flex-row mb-20 mt-4">
             <div className="border px-10 md:px-16 py-8 sm:py-16 flex flex-col gap-5 text-[15px] hover:bg-primary hover:text-white transition-all duration-300 text-gray-600 cursor-pointer">
-              <b>Efficiency:</b>
+              <b>{t('efficiency')}</b>
               <p>
-                Streamlined appointment scheduling that fits into your busy
-                lifestyle.
+                {t('efficiency_text')}
               </p>
             </div>
             <div className="border px-10 md:px-15 py-8 sm:py-16 flex flex-col gap-5 text-[15px] hover:bg-primary hover:text-white transition-all duration-300 text-gray-600 cursor-pointer">
-              <b>Convenience:</b>
+              <b>{t('convenience')}</b>
               <p>
-                Access to a network of trusted healthcare professionals in your
-                area.
+                {t('convenience_text')}
               </p>
             </div>
             <div className="border px-10 md:px-15 py-8 sm:py-16 flex flex-col gap-5 text-[15px] hover:bg-primary hover:text-white transition-all duration-300 text-gray-600 cursor-pointer">
-              <b>Personalization:</b>
+              <b>{t('personalization')}</b>
               <p>
-                Tailored recommendations and reminders to help you stay on top
-                of your health.
+                {t('personalization_text')}
               </p>
             </div>
           </div>

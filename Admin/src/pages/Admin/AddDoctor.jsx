@@ -7,13 +7,17 @@ import MoveUpOnRender from "../../components/MoveUpOnRender";
 
 const initialValues = {
   name: "",
+  nameBn: "",
   email: "",
   password: "",
   experience: "1 Year",
   fees: "",
   about: "",
+  aboutBn: "",
   speciality: "General physician",
+  specialityBn: "",
   degree: "",
+  degreeBn: "",
   address1: "",
   address2: "",
 };
@@ -79,13 +83,17 @@ const AddDoctor = () => {
 
       formData.append("image", docImg);
       formData.append("name", doctorData.name.trim());
+      formData.append("nameBn", doctorData.nameBn?.trim() || "");
       formData.append("email", doctorData.email.trim());
       formData.append("password", doctorData.password);
       formData.append("experience", doctorData.experience);
       formData.append("fees", Number(doctorData.fees));
       formData.append("about", doctorData.about.trim());
+      formData.append("aboutBn", doctorData.aboutBn?.trim() || "");
       formData.append("speciality", doctorData.speciality);
+      formData.append("specialityBn", doctorData.specialityBn?.trim() || "");
       formData.append("degree", doctorData.degree.trim());
+      formData.append("degreeBn", doctorData.degreeBn?.trim() || "");
       formData.append(
         "address",
         JSON.stringify({
@@ -162,7 +170,7 @@ const AddDoctor = () => {
           <div className=" flex flex-col lg:flex-row items-start gap-10 text-gray-600">
             <div className="w-full lg:flex-1 flex flex-col gap-4">
               <div className="flex-1 flex flex-col gap-1">
-                <p>Doctor name</p>
+                <p>Doctor name (English)</p>
                 <input
                   className="border rounded px-3 py-2"
                   type="text"
@@ -170,8 +178,20 @@ const AddDoctor = () => {
                   value={doctorData.name}
                   name="name"
                   label="name"
-                  placeholder="Name"
+                  placeholder="Name (English)"
                   required
+                />
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <p>Doctor name (বাংলা) - Optional</p>
+                <input
+                  className="border rounded px-3 py-2"
+                  type="text"
+                  onChange={handleInputChange}
+                  value={doctorData.nameBn}
+                  name="nameBn"
+                  label="nameBn"
+                  placeholder="নাম (বাংলা)"
                 />
               </div>
 
@@ -240,7 +260,7 @@ const AddDoctor = () => {
 
             <div className="w-full lg:flex-1 flex flex-col gap-4">
               <div className="flex-1 flex flex-col gap-1">
-                <p>Speciality</p>
+                <p>Speciality (English)</p>
                 <select
                   value={doctorData.speciality}
                   onChange={handleInputChange}
@@ -257,9 +277,21 @@ const AddDoctor = () => {
                   <option value="Gastroenterologist">Gastroenterologist</option>
                 </select>
               </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <p>Speciality (বাংলা) - Optional</p>
+                <input
+                  className="border rounded px-3 py-2"
+                  type="text"
+                  value={doctorData.specialityBn}
+                  onChange={handleInputChange}
+                  name="specialityBn"
+                  label="specialityBn"
+                  placeholder="বিশেষত্ব (বাংলা)"
+                />
+              </div>
 
               <div className="flex-1 flex flex-col gap-1">
-                <p>Education</p>
+                <p>Education (English)</p>
                 <input
                   className="border rounded px-3 py-2"
                   type="text"
@@ -267,8 +299,20 @@ const AddDoctor = () => {
                   onChange={handleInputChange}
                   name="degree"
                   label="degree"
-                  placeholder="Education"
+                  placeholder="Education (English)"
                   required
+                />
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <p>Education (বাংলা) - Optional</p>
+                <input
+                  className="border rounded px-3 py-2"
+                  type="text"
+                  value={doctorData.degreeBn}
+                  onChange={handleInputChange}
+                  name="degreeBn"
+                  label="degreeBn"
+                  placeholder="শিক্ষা (বাংলা)"
                 />
               </div>
 
@@ -299,16 +343,28 @@ const AddDoctor = () => {
           </div>
 
           <div className="">
-            <p className="mt-4 mb-2">About Doctor</p>
+            <p className="mt-4 mb-2">About Doctor (English)</p>
             <textarea
               className="w-full px-4 pt-2 border rounded"
-              placeholder="Write about doctor"
+              placeholder="Write about doctor (English)"
               value={doctorData.about}
               onChange={handleInputChange}
               name="about"
               label="about"
               rows={5}
               required
+            />
+          </div>
+          <div className="">
+            <p className="mt-4 mb-2">About Doctor (বাংলা) - Optional</p>
+            <textarea
+              className="w-full px-4 pt-2 border rounded"
+              placeholder="ডাক্তার সম্পর্কে লিখুন (বাংলা)"
+              value={doctorData.aboutBn}
+              onChange={handleInputChange}
+              name="aboutBn"
+              label="aboutBn"
+              rows={5}
             />
           </div>
 

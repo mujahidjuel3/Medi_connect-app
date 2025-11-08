@@ -17,13 +17,15 @@ import { useContext, useEffect } from "react";
 import { AppContext } from "./context/AppContext";
 import axios from "axios";
 import TopLoadingBar from "./components/TopLoadingBar";
+import { useTranslation } from 'react-i18next';
 
 const App = () => {
   const { isLoading, setIsLoading } = useContext(AppContext);
+  const { t } = useTranslation();
 
   return (
     <>
-      {isLoading && <TopLoadingBar message="Loading ..." />}
+      {isLoading && <TopLoadingBar message={t('loading')} />}
       <div className="mx-4 sm:mx-[10%]">
         <Navbar />
         <Routes>
@@ -38,7 +40,7 @@ const App = () => {
           <Route path="/appointment/:docId" element={<Appointment />}></Route>
           <Route path="/chat" element={<Chat />}></Route>
           <Route path="/prescription" element={<Prescription />}></Route>
-          <Route path="*" element={<div>Not found</div>} />
+          <Route path="*" element={<div>{t('not_found')}</div>} />
         </Routes>
         <Footer />
         <ToastContainer />

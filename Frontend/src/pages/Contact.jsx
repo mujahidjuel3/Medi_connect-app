@@ -1,12 +1,14 @@
 import { assets } from "../assets/assets";
 import MoveUpOnRender from "../components/MoveUpOnRender";
+import { useTranslation } from 'react-i18next';
 
 const Contact = () => {
+  const { t } = useTranslation();
   return (
     <MoveUpOnRender id="contact">
       <div className="text-2xl text-center pt-10 text-gray-500">
         <p>
-          CONTACT <span className="text-gray-700 font-semibold">US</span>
+          {t('contact_us')}
         </p>
       </div>
 
@@ -17,7 +19,7 @@ const Contact = () => {
           alt=""
         />
         <div className="flex flex-col justify-center items-start gap-6">
-          <p className="font-semibold text-lg text-gray-600 ">Our OFFICE</p>
+          <p className="font-semibold text-lg text-gray-600 ">{t('our_office')}</p>
           <p className="text-gray-500">
             54709 Willms Station <br /> Suite 350, Washington, USA
           </p>
@@ -25,13 +27,13 @@ const Contact = () => {
             Tel: (415) 555‑0132 <br /> Email: help@prescripto.com
           </p>
           <p className="font-semibold text-lg text-gray-600 ">
-            Careers at PRESCRIPTO
+            {t('careers_at_prescripto')}
           </p>
           <p className="text-gray-500">
-            Learn more about our teams and job openings.
+            {t('careers_text')}
           </p>
           <button className=" border border-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-all duration-500">
-            Explore Jobs
+            {t('explore_jobs')}
           </button>
         </div>
       </div>

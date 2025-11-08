@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 interface ChatWindowProps {
   userId: string;
@@ -10,6 +11,7 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token') || '';
   const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const [conversationId, setConversationId] = useState<string>('');
@@ -77,9 +79,9 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
         setIsLoading(false);
         // Show error to user
         if (err.response?.status === 401) {
-          alert('Please login again to chat with doctors');
+          alert(t('please_login_chat'));
         } else {
-          alert('Failed to initialize chat. Please refresh the page.');
+          alert(t('chat_init_failed'));
         }
       }
     })();
@@ -134,7 +136,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
       if (deletedConvId === conversationId) {
         setMessages([]);
         setConversationId('');
-        alert('Conversation has been deleted');
+        alert(t('conversation_deleted'));
       }
     });
 
@@ -162,7 +164,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
     }
 
     if (!socketRef.current || !socketRef.current.connected) {
-      alert('Connection lost. Please refresh the page.');
+      alert(t('connection_lost'));
       return;
     }
 
@@ -194,7 +196,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
         console.log('Message send response:', response);
         if (response?.error) {
           console.error('Message send error:', response.error);
-          alert(`Failed to send message: ${response.error}`);
+          alert(`${t('send_message_failed')}: ${response.error}`);
           // Remove temp message on error
           setMessages((prev) => prev.filter(m => m._id !== tempMessage._id));
         } else if (response?.success) {
@@ -203,7 +205,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
       });
     } catch (error: any) {
       console.error('Error sending message:', error);
-      alert('Failed to send message. Please try again.');
+      alert(t('send_message_failed'));
       // Remove temp message on error
       setMessages((prev) => prev.filter(m => m._id !== tempMessage._id));
     }
@@ -217,7 +219,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
   };
 
   const deleteMessage = async (messageId: string) => {
-    if (!window.confirm('Are you sure you want to delete this message?')) {
+    if (!window.confirm(t('are_you_sure_delete_message'))) {
       return;
     }
 
@@ -233,18 +235,18 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
       if (data.success) {
         setMessages((prev) => prev.filter((m) => m._id !== messageId));
       } else {
-        alert(data.message || 'Failed to delete message');
+        alert(data.message || t('delete_message_failed'));
       }
     } catch (error: any) {
       console.error('Delete message error:', error);
-      alert(error.response?.data?.message || 'Failed to delete message');
+      alert(error.response?.data?.message || t('delete_message_failed'));
     }
   };
 
   const deleteConversation = async () => {
     if (!conversationId) return;
     
-    if (!window.confirm('Are you sure you want to delete this conversation? All messages will be permanently deleted.')) {
+    if (!window.confirm(t('are_you_sure_delete_conversation'))) {
       return;
     }
 
@@ -260,13 +262,13 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
       if (data.success) {
         setMessages([]);
         setConversationId('');
-        alert('Conversation deleted successfully');
+        alert(t('conversation_deleted'));
       } else {
-        alert(data.message || 'Failed to delete conversation');
+        alert(data.message || t('delete_conversation_failed'));
       }
     } catch (error: any) {
       console.error('Delete conversation error:', error);
-      alert(error.response?.data?.message || 'Failed to delete conversation');
+      alert(error.response?.data?.message || t('delete_conversation_failed'));
     }
   };
 
@@ -274,26 +276,26 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
     <div className="flex flex-col h-[500px] border border-gray-300 rounded-lg bg-white">
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">Loading chat...</p>
+          <p className="text-gray-500">{t('loading')}</p>
         </div>
       ) : (
         <>
           {conversationId && (
             <div className="p-3 border-b flex justify-between items-center bg-gray-50">
-              <h3 className="font-semibold text-gray-700">Chat</h3>
+              <h3 className="font-semibold text-gray-700">{t('chat')}</h3>
               <button
                 onClick={deleteConversation}
                 className="text-red-500 hover:text-red-700 text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors"
-                title="Delete conversation"
+                title={t('delete_conversation')}
               >
-                🗑️ Delete Conversation
+                🗑️ {t('delete_conversation')}
               </button>
             </div>
           )}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 mt-8">
-                <p>No messages yet. Start the conversation!</p>
+                <p>{t('no_messages')}</p>
               </div>
             ) : (
               messages.map((m) => {
@@ -321,7 +323,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
                               hour: '2-digit',
                               minute: '2-digit',
                             })}
-                            {m.isSending && ' (Sending...)'}
+                            {m.isSending && ` (${t('sending')})`}
                           </p>
                         )}
                       </div>
@@ -329,7 +331,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
                         <button
                           onClick={() => deleteMessage(m._id)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 text-sm"
-                          title="Delete message"
+                          title={t('delete_message')}
                         >
                           🗑️
                         </button>
@@ -348,14 +350,14 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
                 onChange={(e) => setText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Type your message..."
+                placeholder={t('type_message')}
               />
               <button
                 onClick={send}
                 disabled={!text.trim()}
                 className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Send
+                {t('send')}
               </button>
             </div>
           </div>

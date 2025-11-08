@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import MoveUpOnRender from "../components/MoveUpOnRender";
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 const Doctors = () => {
   const { speciality } = useParams();
@@ -9,6 +11,7 @@ const Doctors = () => {
   const [filterDoc, setFilterDoc] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const applyFilter = () => {
     if (speciality) {
@@ -23,7 +26,7 @@ const Doctors = () => {
   }, [doctors, speciality]);
   return (
     <div>
-      <p className="text-gray-600">Browse through the doctors specialist.</p>
+      <p className="text-gray-600">{t('browse_doctors')}</p>
       <div className="flex">
         <div className="flex items-start gap-5 mt-5">
           <button
@@ -32,7 +35,7 @@ const Doctors = () => {
             }`}
             onClick={() => setShowFilter((prev) => !prev)}
           >
-            Filter
+            {t('filter')}
           </button>
           <div
             className={`flex-col gap-4 text-sm text-gray-600  ${
@@ -51,7 +54,7 @@ const Doctors = () => {
                   : ""
               }`}
             >
-              General physician
+              {t('general_physician')}
             </p>
             <p
               onClick={() =>
@@ -63,7 +66,7 @@ const Doctors = () => {
                 speciality === "Gynecologist" ? "bg-indigo-100 text-black" : ""
               }`}
             >
-              Gynecologist
+              {t('gynecologist')}
             </p>
             <p
               onClick={() =>
@@ -75,7 +78,7 @@ const Doctors = () => {
                 speciality === "Dermatologist" ? "bg-indigo-100 text-black" : ""
               }`}
             >
-              Dermatologist
+              {t('dermatologist')}
             </p>
             <p
               onClick={() =>
@@ -88,7 +91,7 @@ const Doctors = () => {
                 speciality === "Pediatricians" ? "bg-indigo-100 text-black" : ""
               }`}
             >
-              Pediatricians
+              {t('pediatricians')}
             </p>
             <p
               onClick={() =>
@@ -100,7 +103,7 @@ const Doctors = () => {
                 speciality === "Neurologist" ? "bg-indigo-100 text-black" : ""
               }`}
             >
-              Neurologist
+              {t('neurologist')}
             </p>
             <p
               onClick={() =>
@@ -114,7 +117,7 @@ const Doctors = () => {
                   : ""
               }`}
             >
-              Gastroenterologist
+              {t('gastroenterologist')}
             </p>
           </div>
         </div>
@@ -140,12 +143,14 @@ const Doctors = () => {
                           item?.available ? " bg-green-500" : "bg-gray-500"
                         }  rounded-full`}
                       ></p>{" "}
-                      <p>{item.available ? "Available" : "Not Available"}</p>
+                      <p>{item.available ? t('available') : t('not_available')}</p>
                     </div>
                     <p className="text-gray-900 text-lg font-medium ">
-                      {item.name}
+                      {i18n.language === 'bn' && item.nameBn ? item.nameBn : item.name}
                     </p>
-                    <p className="text-gray-600 text-sm">{item.speciality}</p>
+                    <p className="text-gray-600 text-sm">
+                      {i18n.language === 'bn' && item.specialityBn ? item.specialityBn : item.speciality}
+                    </p>
                   </div>
                 </div>
               ))}

@@ -4,10 +4,12 @@ import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import MoveUpOnRender from "../components/MoveUpOnRender";
+import { useTranslation } from 'react-i18next';
 
 const MyProfile = () => {
   const { backendUrl, token, userData, setUserData, loadUserProfileData } =
     useContext(AppContext);
+  const { t } = useTranslation();
 
   const [isEdit, setEdit] = useState(false);
   const [image, setImage] = useState(false);
@@ -88,12 +90,12 @@ const MyProfile = () => {
           <hr className=" bg-zinc-400 h-[1px] border-none" />
           <div>
             <p className="text-neutral-500 underline mt-3">
-              CONTACT INFORMATION
+              {t('contact_information')}
             </p>
             <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700 ">
-              <p className="font-medium ">Email id:</p>
+              <p className="font-medium ">{t('email_id')}</p>
               <p className="text-blue-500">{userData.email}</p>
-              <p className="font-medium">Phone:</p>
+              <p className="font-medium">{t('phone')}</p>
               {isEdit ? (
                 <input
                   className="bg-gray-100 max-w-52"
@@ -107,7 +109,7 @@ const MyProfile = () => {
                 <p className="text-blue-500">{userData.phone}</p>
               )}
 
-              <p className="font-medium">Address:</p>
+              <p className="font-medium">{t('address')}</p>
               {isEdit ? (
                 <p>
                   <input
@@ -145,9 +147,9 @@ const MyProfile = () => {
             </div>
           </div>
           <div>
-            <p className="text-neutral-500 underline mt-3">BASIC INFORMATION</p>
+            <p className="text-neutral-500 underline mt-3">{t('basic_information')}</p>
             <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
-              <p className="font-medium">Gender:</p>
+              <p className="font-medium">{t('gender')}</p>
               {isEdit ? (
                 <select
                   className="max-w-20 bg-gray-100"
@@ -156,14 +158,14 @@ const MyProfile = () => {
                   }
                   value={userData.gender}
                 >
-                  <option value="Male">Male</option>
-                  <option value="female">female</option>
+                  <option value="Male">{t('male')}</option>
+                  <option value="female">{t('female')}</option>
                 </select>
               ) : (
                 <p className="text-gray-400">{userData.gender}</p>
               )}
 
-              <p className="font-medium">Birthday</p>
+              <p className="font-medium">{t('birthday')}</p>
               {isEdit ? (
                 <input
                   className="max-w-28 bg-gray-100"
@@ -185,14 +187,14 @@ const MyProfile = () => {
                 className="border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-100"
                 onClick={updateUserProfileData}
               >
-                Save information
+                {t('save_information')}
               </button>
             ) : (
               <button
                 className="border border-primary px-8 py-2 rounded-full  hover:bg-primary hover:text-white transition-all duration-100"
                 onClick={() => setEdit(true)}
               >
-                Edit
+                {t('edit')}
               </button>
             )}
           </div>

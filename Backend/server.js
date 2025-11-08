@@ -128,7 +128,7 @@ io.on("connection", (socket) => {
 
   socket.on("chat:message", async ({ conversationId, text, senderRole }, callback) => {
     try {
-      const { default: Message } = await import("./models/Message.js");
+    const { default: Message } = await import("./models/Message.js");
       const senderId = socket.user?.id;
       const role = senderRole || socket.user?.role || "user";
       
@@ -146,8 +146,8 @@ io.on("connection", (socket) => {
         return;
       }
 
-      const msg = await Message.create({
-        conversation: conversationId,
+    const msg = await Message.create({
+      conversation: conversationId,
         sender: senderId,
         senderModel: role === "doctor" ? "doctor" : "user",
         senderRole: role,

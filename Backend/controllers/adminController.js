@@ -10,12 +10,16 @@ const addDoctor = async (req, res) => {
   try {
     const {
       name,
+      nameBn,
       email,
       password,
       speciality,
+      specialityBn,
       degree,
+      degreeBn,
       experience,
       about,
+      aboutBn,
       fees,
       address,
     } = req.body;
@@ -113,13 +117,17 @@ const addDoctor = async (req, res) => {
 
     const doctorData = {
       name: name.trim(),
+      nameBn: nameBn?.trim() || "",
       email: normalizedEmail, // Use already normalized email
       image: imageUrl,
       password: hashedPassword,
       speciality,
+      specialityBn: specialityBn?.trim() || "",
       degree: degree.trim(),
+      degreeBn: degreeBn?.trim() || "",
       experience,
       about: about.trim(),
+      aboutBn: aboutBn?.trim() || "",
       fees: Number(fees),
       address: parsedAddress,
       date: Date.now(),

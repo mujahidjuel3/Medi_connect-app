@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 export default function PrescriptionUpload({ doctorId }: { doctorId?: string }) {
+  const { t } = useTranslation();
   const [file, setFile] = useState<File|null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [url, setUrl] = useState<string|undefined>();
@@ -11,7 +13,7 @@ export default function PrescriptionUpload({ doctorId }: { doctorId?: string }) 
     e.preventDefault();
     if (!file) return;
     if (!doctorId) {
-      alert('Please select a doctor');
+      alert(t('select_doctor_first'));
       return;
     }
     
@@ -28,12 +30,12 @@ export default function PrescriptionUpload({ doctorId }: { doctorId?: string }) 
       if (res.data.success) {
         setUrl(res.data.url);
         setFile(null);
-        alert('Prescription uploaded successfully!');
+        alert(t('prescription_uploaded_success'));
       } else {
-        alert(res.data.message || 'Upload failed');
+        alert(res.data.message || t('upload_failed'));
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Upload failed');
+      alert(error.response?.data?.message || t('upload_failed'));
     } finally {
       setIsUploading(false);
     }
@@ -43,7 +45,7 @@ export default function PrescriptionUpload({ doctorId }: { doctorId?: string }) 
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select Prescription File (Image or PDF)
+          {t('select_prescription_file')}
         </label>
         <input
           type="file"
@@ -58,19 +60,19 @@ export default function PrescriptionUpload({ doctorId }: { doctorId?: string }) 
         className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         disabled={!file || isUploading}
       >
-        {isUploading ? 'Uploading...' : 'Upload Prescription'}
+        {isUploading ? t('uploading') : t('upload_prescription_btn')}
       </button>
       
       {url && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800 font-medium mb-2">✅ Prescription uploaded successfully!</p>
+          <p className="text-green-800 font-medium mb-2">✅ {t('prescription_uploaded_success')}</p>
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary underline hover:text-primary/80"
           >
-            View Prescription
+            {t('view_prescription')}
           </a>
         </div>
       )}
