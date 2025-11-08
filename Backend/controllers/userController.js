@@ -306,6 +306,18 @@ const verifyRazorpay = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+
+// API to get all doctors (for users)
+const allDoctors = async (_req, res) => {
+  try {
+    const doctors = await doctorModel.find({}).select("-password");
+    res.json({ success: true, doctors });
+  } catch (error) {
+    console.log("error:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -316,4 +328,5 @@ export {
   cancelAppointment,
   paymentRazorpay,
   verifyRazorpay,
+  allDoctors,
 };

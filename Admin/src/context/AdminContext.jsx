@@ -9,8 +9,11 @@ const AdminContextProvider = (props) => {
     localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
   );
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
   const [dashData, setDashData] = useState([]);
 
   const getAllDoctors = async () => {
@@ -18,15 +21,14 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.get(backendUrl + "/api/admin/all-doctors", {
         headers: { aToken },
       });
-      console.log("data:", data);
 
       if (data.success) {
         setDoctors(data.doctors);
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to load doctors");
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Failed to load doctors");
     }
   };
 
@@ -45,8 +47,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log("error:", error);
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Failed to change availability");
     }
   };
 
@@ -70,26 +71,22 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log("error:", error);
       toast.error(error.response?.data?.message || "Failed to delete doctor");
     }
   };
 
   const getAllAppointments = async () => {
-    console.log("getAllAppointments:");
     try {
       const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
         headers: { aToken },
       });
       if (data.success) {
         setAppointments(data.appointments);
-        console.log("data.appointments:", data);
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to load appointments");
       }
     } catch (error) {
-      console.log("error:", error);
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Failed to load appointments");
     }
   };
 
@@ -108,8 +105,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log("error:", error);
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Failed to cancel appointment");
     }
   };
 
@@ -119,18 +115,51 @@ const AdminContextProvider = (props) => {
         headers: { aToken },
       });
       if (data.success) {
-        console.log("data:", data);
         setDashData(data.dashData);
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to load dashboard data");
       }
     } catch (error) {
-      console.log("error:", error);
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Failed to load dashboard data");
     }
   };
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-  console.log("Admin Backend URL:", backendUrl);
+
+  const getAllPrescriptions = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/prescriptions/admin/all", {
+        headers: { aToken },
+      });
+      if (data.success) {
+        setPrescriptions(data.prescriptions || []);
+      } else {
+        toast.error(data.message || "Failed to load prescriptions");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load prescriptions");
+    }
+  };
+
+  const deletePrescription = async (prescriptionId) => {
+    try {
+      if (!window.confirm("Are you sure you want to delete this prescription?")) {
+        return;
+      }
+
+      const { data } = await axios.delete(backendUrl + "/api/prescriptions", {
+        data: { prescriptionId },
+        headers: { aToken },
+      });
+
+      if (data.success) {
+        toast.success(data.message || "Prescription deleted successfully");
+        getAllPrescriptions();
+      } else {
+        toast.error(data.message || "Failed to delete prescription");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete prescription");
+    }
+  };
   const value = {
     aToken,
     setAToken,
@@ -145,6 +174,9 @@ const AdminContextProvider = (props) => {
     cancelAppointment,
     getDashData,
     dashData,
+    prescriptions,
+    getAllPrescriptions,
+    deletePrescription,
   };
 
   return (

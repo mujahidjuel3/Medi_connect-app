@@ -16,6 +16,7 @@ import userModel from "./models/userModel.js";
 import doctorModel from "./models/doctorModel.js";
 import Conversation from "./models/Conversation.js";
 import Message from "./models/Message.js";
+import Prescription from "./models/Prescription.js";
 
 // Routes
 import adminRouter from "./routes/adminRoute.js";

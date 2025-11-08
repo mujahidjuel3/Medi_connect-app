@@ -10,10 +10,11 @@ import axios from "axios";
 const Prescription = () => {
   const { token, userData, backendUrl } = useContext(AppContext);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const appointmentIdFromUrl = searchParams.get("appointmentId");
-  const [appointments, setAppointments] = useState([]);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(() => {
+    // Load selected doctor from localStorage
+    return localStorage.getItem('selectedDoctorId') || null;
+  });
 
   useEffect(() => {
     if (!token || !userData) {
@@ -21,28 +22,28 @@ const Prescription = () => {
       navigate("/login");
       return;
     }
-    fetchAppointments();
-    
-    // If appointmentId is in URL, auto-select that appointment
-    if (appointmentIdFromUrl) {
-      setSelectedAppointment(appointmentIdFromUrl);
-    }
-  }, [token, userData, navigate, appointmentIdFromUrl]);
+    fetchDoctors();
+  }, [token, userData, navigate]);
 
-  const fetchAppointments = async () => {
+  // Save selected doctor to localStorage
+  useEffect(() => {
+    if (selectedDoctor) {
+      localStorage.setItem('selectedDoctorId', selectedDoctor);
+    }
+  }, [selectedDoctor]);
+
+  const fetchDoctors = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/user/appointments", {
+      const { data } = await axios.get(backendUrl + "/api/user/all-doctors", {
         headers: { token },
       });
       if (data.success) {
-        // Show only completed appointments
-        const completed = data.appointments.filter(
-          (apt) => apt.isCompleted && !apt.cancelled
-        );
-        setAppointments(completed);
+        // Filter only available doctors
+        const available = data.doctors.filter((doc) => doc.available);
+        setDoctors(available);
       }
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      console.error("Error fetching doctors:", error);
     }
   };
 
@@ -65,47 +66,37 @@ const Prescription = () => {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          {appointments.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">
-                No completed appointments found. Upload prescription for a
-                completed appointment.
-              </p>
+          <div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Doctor <span className="text-red-500">*</span>
+              </label>
+              <select
+                className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                value={selectedDoctor || ""}
+                onChange={(e) =>
+                  setSelectedDoctor(e.target.value ? e.target.value : null)
+                }
+                required
+              >
+                <option value="">Select a doctor</option>
+                {doctors.map((doc) => (
+                  <option key={doc._id} value={doc._id}>
+                    {doc.name} - {doc.speciality}
+                  </option>
+                ))}
+              </select>
             </div>
-          ) : (
-            <div>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Appointment (Optional)
-                </label>
-                <select
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  value={selectedAppointment || ""}
-                  onChange={(e) =>
-                    setSelectedAppointment(
-                      e.target.value ? e.target.value : null
-                    )
-                  }
-                >
-                  <option value="">No specific appointment</option>
-                  {appointments.map((apt) => (
-                    <option key={apt._id} value={apt._id}>
-                      {apt.docData?.name} - {apt.slotDate} {apt.slotTime}
-                    </option>
-                  ))}
-                </select>
-              </div>
 
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">
-                  Upload Prescription File
-                </h3>
-                <PrescriptionUpload
-                  appointmentId={selectedAppointment || undefined}
-                />
-              </div>
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold mb-4">
+                Upload Prescription File
+              </h3>
+              <PrescriptionUpload
+                doctorId={selectedDoctor || undefined}
+              />
             </div>
-          )}
+          </div>
         </div>
       </div>
     </MoveUpOnRender>
