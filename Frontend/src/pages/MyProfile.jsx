@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import MoveUpOnRender from "../components/MoveUpOnRender";
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 const MyProfile = () => {
   const { backendUrl, token, userData, setUserData, loadUserProfileData } =
@@ -18,6 +19,7 @@ const MyProfile = () => {
     try {
       const formData = new FormData();
       formData.append("name", userData.name);
+      formData.append("nameBn", userData.nameBn || "");
       formData.append("phone", userData.phone);
       formData.append("address", JSON.stringify(userData.address));
       formData.append("gender", userData.gender);
@@ -74,17 +76,29 @@ const MyProfile = () => {
             <img className="w-36 rounded" src={userData.image} alt="" />
           )}
           {isEdit ? (
-            <input
-              className="bg-gray-50 text-3xl font-medium max-w-60 mt-4 capitalize"
-              value={userData.name}
-              type="text"
-              onChange={(e) =>
-                setUserData((prev) => ({ ...prev, name: e.target.value }))
-              }
-            />
+            <>
+              <input
+                className="bg-gray-50 text-3xl font-medium max-w-60 mt-4 capitalize"
+                value={userData.name}
+                type="text"
+                onChange={(e) =>
+                  setUserData((prev) => ({ ...prev, name: e.target.value }))
+                }
+                placeholder="English Name"
+              />
+              <input
+                className="bg-gray-50 text-3xl font-medium max-w-60 mt-2"
+                value={userData.nameBn || ""}
+                type="text"
+                onChange={(e) =>
+                  setUserData((prev) => ({ ...prev, nameBn: e.target.value }))
+                }
+                placeholder="বাংলা নাম (ঐচ্ছিক)"
+              />
+            </>
           ) : (
             <p className="font-medium text-3xl text-neutral-800 mt-4 capitalize">
-              {userData.name}
+              {i18n.language === 'bn' && userData.nameBn ? userData.nameBn : userData.name}
             </p>
           )}
           <hr className=" bg-zinc-400 h-[1px] border-none" />

@@ -11,7 +11,7 @@ import razorpay from "razorpay";
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, nameBn, email, password } = req.body;
     if (!name || !email || !password) {
       return res.json({ success: false, message: "Missing Detail" });
     }
@@ -42,6 +42,7 @@ const registerUser = async (req, res) => {
 
     const userData = {
       name,
+      nameBn: nameBn?.trim() || "",
       email,
       password: hashedPassword,
     };
@@ -107,7 +108,7 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { userId, name, phone, address, dob, gender } = req.body;
+    const { userId, name, nameBn, phone, address, dob, gender } = req.body;
 
     const imageFile = req.file;
 
@@ -117,6 +118,7 @@ const updateProfile = async (req, res) => {
 
     await userModel.findByIdAndUpdate(userId, {
       name,
+      nameBn: nameBn?.trim() || "",
       phone,
       address: JSON.parse(address),
       dob,

@@ -21,13 +21,13 @@ const Contact = () => {
         <div className="flex flex-col justify-center items-start gap-6">
           <p className="font-semibold text-lg text-gray-600 ">{t('our_office')}</p>
           <p className="text-gray-500">
-            54709 Willms Station <br /> Suite 350, Washington, USA
+            DIT Project, Merul Badda <br /> Road No-10, Dhaka, Bangladesh
           </p>
           <p className="text-gray-500">
-            Tel: (415) 555‑0132 <br /> Email: help@prescripto.com
+            Tel: 01727983686 <br /> Email: help@mediconnect.com
           </p>
           <p className="font-semibold text-lg text-gray-600 ">
-            {t('careers_at_prescripto')}
+            {t('careers_at_mediconnect')}
           </p>
           <p className="text-gray-500">
             {t('careers_text')}

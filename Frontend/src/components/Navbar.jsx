@@ -18,7 +18,7 @@ const Navbar = () => {
     <div className="flex sticky top-0 bg-white/90 z-10 items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
       <img
         onClick={() => navigate("/")}
-        className="w-44 cursor-pointer"
+        className="w-44 cursor-pointer md:w-48 lg:w-52"
         src={assets.logo}
         alt=""
       />
@@ -164,7 +164,7 @@ const Navbar = () => {
                     navigate("/chat");
                     setShowMenu(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 rounded inline-block"
+                  className="flex items-center gap-2 px-4 py-2 rounded"
                 >
                   <img src={assets.chats_icon} className="w-5 h-5" alt="Chat" />
                   <span>{t('chat_with_doctor')}</span>
@@ -174,7 +174,7 @@ const Navbar = () => {
                     navigate("/prescription");
                     setShowMenu(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 rounded inline-block"
+                  className="flex items-center gap-2 px-4 py-2 rounded"
                 >
                   <img src={assets.upload_icon} className="w-5 h-5" alt="Prescription" />
                   <span>{t('upload_prescription')}</span>

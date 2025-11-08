@@ -19,7 +19,7 @@ const Navbar = () => {
     <div className="flex sticky top-0 bg-white/90 z-10 justify-between items-center px-4 py-2 sm:px-10 border-b bg-white">
       <div className="flex items-center gap-2 text-xs">
         <img
-          className="w-96 sm:w-40 cursor-pointer"
+          className="w-96 sm:w-44 cursor-pointer"
           src={assets.admin_logo}
           alt=""
         />

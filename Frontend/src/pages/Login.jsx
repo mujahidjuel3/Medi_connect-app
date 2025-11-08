@@ -15,6 +15,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [nameBn, setNameBn] = useState("");
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -22,6 +23,7 @@ const Login = () => {
       if (state === "Sign Up") {
         const { data } = await axios.post(backendUrl + "/api/user/register", {
           name,
+          nameBn,
           password,
           email,
         });
@@ -68,16 +70,28 @@ const Login = () => {
         </p>
 
         {state === "Sign Up" && (
-          <div className="w-full">
-            <p>{t('full_name')}</p>
-            <input
-              className="border border-zinc-300 rounded w-full p-2 mt-1"
-              type="text"
-              onChange={(e) => setName(e.target.value)}
-              value={name}
-              required
-            />
-          </div>
+          <>
+            <div className="w-full">
+              <p>{t('full_name')} (English)</p>
+              <input
+                className="border border-zinc-300 rounded w-full p-2 mt-1"
+                type="text"
+                onChange={(e) => setName(e.target.value)}
+                value={name}
+                required
+              />
+            </div>
+            <div className="w-full">
+              <p>{t('full_name')} (বাংলা) - {t('optional')}</p>
+              <input
+                className="border border-zinc-300 rounded w-full p-2 mt-1"
+                type="text"
+                onChange={(e) => setNameBn(e.target.value)}
+                value={nameBn}
+                placeholder="বাংলা নাম (ঐচ্ছিক)"
+              />
+            </div>
+          </>
         )}
 
         <div className="w-full">

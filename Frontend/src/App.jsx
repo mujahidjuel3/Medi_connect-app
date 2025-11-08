@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import Contact from "./pages/Contact";
 import Chat from "./pages/Chat";
 import Prescription from "./pages/Prescription";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Footer from "./components/Footer";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./context/AppContext";
@@ -35,6 +36,7 @@ const App = () => {
           <Route path="/login" element={<Login />}></Route>
           <Route path="/about" element={<About />}></Route>
           <Route path="/contact" element={<Contact />}></Route>
+          <Route path="/privacy-policy" element={<PrivacyPolicy />}></Route>
           <Route path="/my-profile" element={<MyProfile />}></Route>
           <Route path="/my-appointments" element={<MyAppointments />}></Route>
           <Route path="/appointment/:docId" element={<Appointment />}></Route>
