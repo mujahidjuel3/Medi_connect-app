@@ -10,6 +10,11 @@ import {
   cancelAppointment,
   paymentRazorpay,
   verifyRazorpay,
+  paymentSSLCommerz,
+  sslcommerzIPN,
+  sslcommerzSuccess,
+  sslcommerzFail,
+  sslcommerzCancel,
   allDoctors,
 } from "../controllers/userController.js";
 import authUser from "../middlewares/authUser.js";
@@ -31,6 +36,15 @@ userRouter.get("/appointments", authUser, listAppointment);
 userRouter.post("/cancel-appointment", authUser, cancelAppointment);
 userRouter.post("/payment-razorpay", authUser, paymentRazorpay);
 userRouter.post("/verify-razorpay", authUser, verifyRazorpay);
+userRouter.post("/payment-sslcommerz", authUser, paymentSSLCommerz);
+userRouter.post("/sslcommerz-ipn", sslcommerzIPN);
+// SSLCommerz sends both GET and POST requests for callbacks
+userRouter.get("/sslcommerz-success", sslcommerzSuccess);
+userRouter.post("/sslcommerz-success", sslcommerzSuccess);
+userRouter.get("/sslcommerz-fail", sslcommerzFail);
+userRouter.post("/sslcommerz-fail", sslcommerzFail);
+userRouter.get("/sslcommerz-cancel", sslcommerzCancel);
+userRouter.post("/sslcommerz-cancel", sslcommerzCancel);
 userRouter.get("/all-doctors", authUser, allDoctors);
 
 export default userRouter;

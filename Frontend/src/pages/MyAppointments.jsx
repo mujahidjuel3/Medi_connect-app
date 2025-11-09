@@ -17,6 +17,21 @@ const MyAppointments = () => {
     if (token) {
       getUserAppointments();
     }
+    // Check for payment status in URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    if (paymentStatus === 'success') {
+      toast.success(t('payment_success'));
+      getUserAppointments();
+      // Clean URL
+      window.history.replaceState({}, document.title, '/my-appointments');
+    } else if (paymentStatus === 'failed') {
+      toast.error(t('payment_failed'));
+      window.history.replaceState({}, document.title, '/my-appointments');
+    } else if (paymentStatus === 'cancelled') {
+      toast.info(t('payment_cancelled'));
+      window.history.replaceState({}, document.title, '/my-appointments');
+    }
   }, [token]);
   const months = [
     "",
@@ -129,6 +144,27 @@ const MyAppointments = () => {
     }
   };
 
+  // handle SSLCommerz payment
+  const appointmentSSLCommerz = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/user/payment-sslcommerz",
+        { appointmentId },
+        { headers: { token } }
+      );
+
+      if (data.success && data.gatewayUrl) {
+        // Redirect to SSLCommerz payment gateway
+        window.location.href = data.gatewayUrl;
+      } else {
+        toast.error(data?.message || t('payment_initiation_failed'));
+      }
+    } catch (error) {
+      console.log("error:", error);
+      toast.error(error.message || t('payment_initiation_failed'));
+    }
+  };
+
   //handle navigation
   const handleNavigation = (docId) => {
     navigate(`/appointment/${docId}`);
@@ -180,7 +216,7 @@ const MyAppointments = () => {
               )}
               {!item.cancelled && !item.payment && !item.isCompleted && (
                 <button
-                  onClick={() => appointmentRazorpay(item?._id)}
+                  onClick={() => appointmentSSLCommerz(item?._id)}
                   className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-primary hover:text-white tranisal duration-300"
                 >
                   {t('pay_online')}

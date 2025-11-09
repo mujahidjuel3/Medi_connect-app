@@ -175,5 +175,9 @@
   "privacy_changes_text": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the 'Last Updated' date.",
   "privacy_contact_title": "Contact Us",
   "privacy_contact_text": "If you have any questions about this Privacy Policy, please contact us at help@mediconnect.com or through our contact page.",
-  "privacy_last_updated": "Last Updated: January 2025"
+  "privacy_last_updated": "Last Updated: January 2025",
+  "payment_success": "Payment successful!",
+  "payment_failed": "Payment failed. Please try again.",
+  "payment_cancelled": "Payment cancelled.",
+  "payment_initiation_failed": "Failed to initiate payment. Please try again."
 }
