@@ -60,44 +60,44 @@ const Login = () => {
     }
   }, [token]);
   return (
-    <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
-      <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[320px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg ">
-        <p className="text-2xl font-semibold">
+    <form onSubmit={onSubmitHandler} className="min-h-[70vh] sm:min-h-[80vh] flex items-center px-2 xs:px-4">
+      <div className="flex flex-col gap-2 sm:gap-3 m-auto items-start p-4 sm:p-6 md:p-8 w-full max-w-[320px] xs:max-w-[360px] sm:min-w-96 border rounded-xl text-zinc-600 text-xs sm:text-sm shadow-lg">
+        <p className="text-xl sm:text-2xl md:text-3xl font-semibold">
           {state === "Sign Up" ? t('create_account_title') : t('login_title')}
         </p>
-        <p>
+        <p className="text-xs sm:text-sm">
           {state === "Sign Up" ? t('please_sign_up') : t('please_log_in')}
         </p>
 
         {state === "Sign Up" && (
           <>
-            <div className="w-full">
-              <p>{t('full_name')} (English)</p>
-              <input
-                className="border border-zinc-300 rounded w-full p-2 mt-1"
-                type="text"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-                required
-              />
-            </div>
-            <div className="w-full">
-              <p>{t('full_name')} (বাংলা) - {t('optional')}</p>
-              <input
-                className="border border-zinc-300 rounded w-full p-2 mt-1"
-                type="text"
-                onChange={(e) => setNameBn(e.target.value)}
-                value={nameBn}
-                placeholder="বাংলা নাম (ঐচ্ছিক)"
-              />
-            </div>
+        <div className="w-full">
+          <p className="text-xs sm:text-sm">{t('full_name')} (English)</p>
+          <input
+            className="border border-zinc-300 rounded w-full p-1.5 sm:p-2 mt-1 text-xs sm:text-sm"
+            type="text"
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+            required
+          />
+        </div>
+        <div className="w-full">
+          <p className="text-xs sm:text-sm">{t('full_name')} (বাংলা) - {t('optional')}</p>
+          <input
+            className="border border-zinc-300 rounded w-full p-1.5 sm:p-2 mt-1 text-xs sm:text-sm"
+            type="text"
+            onChange={(e) => setNameBn(e.target.value)}
+            value={nameBn}
+            placeholder="বাংলা নাম (ঐচ্ছিক)"
+          />
+        </div>
           </>
         )}
 
         <div className="w-full">
-          <p>{t('email')}</p>
+          <p className="text-xs sm:text-sm">{t('email')}</p>
           <input
-            className="border border-zinc-300 rounded w-full p-2 mt-1"
+            className="border border-zinc-300 rounded w-full p-1.5 sm:p-2 mt-1 text-xs sm:text-sm"
             type="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
@@ -105,9 +105,9 @@ const Login = () => {
           />
         </div>
         <div className="w-full">
-          <p>{t('password')}</p>
+          <p className="text-xs sm:text-sm">{t('password')}</p>
           <input
-            className="border border-zinc-300 rounded w-full p-2 mt-1"
+            className="border border-zinc-300 rounded w-full p-1.5 sm:p-2 mt-1 text-xs sm:text-sm"
             type="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
@@ -116,13 +116,13 @@ const Login = () => {
         </div>
         <button
           type="submit"
-          className="bg-primary text-white w-full py-2 rounded-md text-base"
+          className="bg-primary text-white w-full py-1.5 sm:py-2 rounded-md text-xs sm:text-sm md:text-base"
         >
           {state === "Sign Up" ? t('create_account_title') : t('login_title')}
         </button>
         {state === "Sign Up" ? (
-          <p className="">
-            {t('already_have_account')}
+          <p className="text-xs sm:text-sm">
+            {t('already_have_account')}{" "}
             <span
               onClick={() => setState("Login")}
               className="text-primary underline cursor-pointer"
@@ -131,8 +131,8 @@ const Login = () => {
             </span>
           </p>
         ) : (
-          <p>
-            {t('create_new_account')}
+          <p className="text-xs sm:text-sm">
+            {t('create_new_account')}{" "}
             <span
               onClick={() => setState("Sign Up")}
               className="text-primary underline cursor-pointer"

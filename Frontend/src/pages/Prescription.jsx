@@ -55,26 +55,26 @@ const Prescription = () => {
 
   return (
     <MoveUpOnRender id="prescription">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
+      <div className="max-w-full sm:max-w-2xl md:max-w-4xl mx-auto px-2 xs:px-4 sm:px-6">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
           <img
             src={assets.upload_icon}
-            className="w-8 h-8"
+            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
             alt="Prescription"
           />
-          <h1 className="text-2xl font-semibold text-gray-800">
+          <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
             {t('upload_prescription')}
           </h1>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 md:p-6">
           <div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-4 sm:mb-5 md:mb-6">
+              <label className="block text-xs sm:text-sm md:text-base font-medium text-gray-700 mb-1.5 sm:mb-2">
                 {t('select_doctor')} <span className="text-red-500">*</span>
               </label>
               <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                className="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base"
                 value={selectedDoctor || ""}
                 onChange={(e) =>
                   setSelectedDoctor(e.target.value ? e.target.value : null)
@@ -90,8 +90,8 @@ const Prescription = () => {
               </select>
             </div>
 
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">
+            <div className="border-t pt-4 sm:pt-5 md:pt-6">
+              <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">
                 {t('upload_prescription_file')}
               </h3>
               <PrescriptionUpload

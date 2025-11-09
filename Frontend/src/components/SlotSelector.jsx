@@ -29,29 +29,28 @@ const SlotSelector = ({ docSlots, slotIndex, slotTime, setSlotTime }) => {
   };
 
   return (
-    <div className="flex items-center relative w-full mt-4">
+    <div className="flex items-center relative w-full mt-3 sm:mt-4">
       {/* Left Arrow Button */}
-      <div className="flex mr-2">
+      <div className="flex mr-1 sm:mr-2">
         <button
-          className="p-2 bg-gray-100 rounded-full shadow-md hover:bg-gray-300 transition"
+          className="p-1.5 sm:p-2 bg-gray-100 rounded-full shadow-md hover:bg-gray-300 transition"
           onClick={scrollLeft}
         >
-          <FaChevronLeft size={15} />
+          <FaChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
         </button>
       </div>
 
       {/* Scrollable Slots Container */}
-
-      <div className="overflow-x-hidden">
+      <div className="overflow-x-hidden flex-1">
         <div
           ref={containerRef}
-          className="flex items-center gap-3 w-full overflow-x-hidden snap-x snap-mandatory  px-8 py-2 scrollbar-hide"
+          className="flex items-center gap-2 sm:gap-3 w-full overflow-x-auto snap-x snap-mandatory px-2 sm:px-4 md:px-6 lg:px-8 py-2 scrollbar-hide"
         >
           {docSlots.length > 0 &&
             docSlots[slotIndex].map((item, index) => (
               <p
                 onClick={() => setSlotTime(item?.time)}
-                className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer snap-end ${
+                className={`text-xs sm:text-sm font-light flex-shrink-0 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-full cursor-pointer snap-end ${
                   item.time === slotTime
                     ? "bg-primary text-white"
                     : "text-gray-400 border border-gray-300"
@@ -67,12 +66,12 @@ const SlotSelector = ({ docSlots, slotIndex, slotTime, setSlotTime }) => {
       </div>
 
       {/* Right Arrow Button */}
-      <div className="flex ml-2">
+      <div className="flex ml-1 sm:ml-2">
         <button
-          className=" p-2 bg-gray-100 rounded-full shadow-md hover:bg-gray-300 transition "
+          className="p-1.5 sm:p-2 bg-gray-100 rounded-full shadow-md hover:bg-gray-300 transition"
           onClick={scrollRight}
         >
-          <FaChevronRight size={15} />
+          <FaChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
         </button>
       </div>
     </div>
