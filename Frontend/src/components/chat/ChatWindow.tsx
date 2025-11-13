@@ -19,6 +19,7 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -73,6 +74,13 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
         }
         
         setIsLoading(false);
+        
+        // Scroll to bottom after messages load
+        setTimeout(() => {
+          if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+          }
+        }, 200);
       } catch (err: any) {
         console.error('Chat init failed:', err);
         console.error('Error details:', err.response?.data || err.message);
@@ -109,8 +117,9 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
         return [...prev, { ...msg, isSending: false }];
       });
       
+      // Scroll to bottom when new message arrives
       setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        scrollToBottom();
       }, 100);
     });
 
@@ -152,6 +161,24 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
     }
   }, [conversationId]);
 
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    } else if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Auto scroll when messages change
+  useEffect(() => {
+    if (messages.length > 0 && !isLoading) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [messages.length, isLoading]);
+
   const send = async () => {
     if (!text.trim() || !conversationId) {
       console.error('Cannot send message:', { 
@@ -182,9 +209,10 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
     };
     setMessages((prev) => [...prev, tempMessage]);
     
+    // Scroll to bottom after adding temp message
     setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+      scrollToBottom();
+    }, 50);
 
     try {
       // Send via socket
@@ -273,26 +301,34 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
   };
 
   return (
-    <div className="flex flex-col h-[500px] border border-gray-300 rounded-lg bg-white">
+    <div className="flex flex-col h-[400px] xs:h-[450px] sm:h-[500px] md:h-[550px] lg:h-[600px] xl:h-[650px] 2xl:h-[700px] border-2 border-gray-200 rounded-xl bg-white shadow-lg overflow-hidden w-full">
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">{t('loading')}</p>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-500">{t('loading')}</p>
+          </div>
         </div>
       ) : (
         <>
           {conversationId && (
-            <div className="p-3 border-b flex justify-between items-center bg-gray-50">
-              <h3 className="font-semibold text-gray-700">{t('chat')}</h3>
+            <div className="p-2 xs:p-3 sm:p-4 md:p-5 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white shadow-sm">
+              <h3 className="font-semibold text-gray-800 text-sm xs:text-base sm:text-lg md:text-xl">{t('chat')}</h3>
               <button
                 onClick={deleteConversation}
-                className="text-red-500 hover:text-red-700 text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                className="text-red-500 hover:text-red-700 text-xs xs:text-sm px-2 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 rounded-lg hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300 flex items-center gap-1 xs:gap-2"
                 title={t('delete_conversation')}
               >
-                🗑️ {t('delete_conversation')}
+                <span className="text-xs xs:text-sm">🗑️</span>
+                <span className="hidden sm:inline text-xs sm:text-sm">{t('delete_conversation')}</span>
               </button>
             </div>
           )}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 xs:p-2 sm:p-3 md:p-3 lg:p-4 xl:p-5 2xl:p-6 space-y-1.5 xs:space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-3 xl:space-y-4 bg-gray-50 min-h-0"
+            style={{ scrollBehavior: 'smooth' }}
+          >
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 mt-8">
                 <p>{t('no_messages')}</p>
@@ -308,17 +344,17 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
                     key={m._id || `msg-${m.text}-${m.createdAt}`}
                     className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}
                   >
-                    <div className={`relative ${isMe ? 'flex-row-reverse' : 'flex-row'} flex items-start gap-2`}>
+                    <div className={`relative ${isMe ? 'flex-row-reverse' : 'flex-row'} flex items-start gap-1 xs:gap-1.5 sm:gap-2 md:gap-2 lg:gap-2.5 xl:gap-3 w-full max-w-full`}>
                       <div
-                        className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                        className={`max-w-[90%] xs:max-w-[88%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%] 2xl:max-w-[65%] rounded-2xl px-2 xs:px-2.5 sm:px-3 md:px-3.5 lg:px-4 xl:px-5 2xl:px-6 py-1.5 xs:py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 shadow-sm break-words ${
                           isMe
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-gradient-to-br from-primary to-primary/90 text-white rounded-br-sm'
+                            : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm'
                         } ${m.isSending ? 'opacity-70' : ''}`}
                       >
-                        <p className="text-sm">{m.text}</p>
+                        <p className="text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere">{m.text}</p>
                         {m.createdAt && (
-                          <p className={`text-xs mt-1 ${isMe ? 'text-white/70' : 'text-gray-500'}`}>
+                          <p className={`text-[9px] xs:text-[10px] sm:text-xs mt-0.5 xs:mt-1 sm:mt-1.5 md:mt-1.5 lg:mt-2 ${isMe ? 'text-white/80' : 'text-gray-500'}`}>
                             {new Date(m.createdAt).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit',
@@ -343,21 +379,23 @@ export default function ChatWindow({ userId, doctorId }: ChatWindowProps) {
             )}
             <div ref={bottomRef} />
           </div>
-          <div className="border-t border-gray-200 p-3">
-            <div className="flex gap-2">
+          <div className="border-t-2 border-gray-200 px-1.5 xs:px-2 sm:px-3 md:px-3 lg:px-4 xl:px-5 py-1.5 xs:py-2 sm:py-3 md:py-3 lg:py-4 xl:py-5 bg-white shadow-lg sticky bottom-0 z-10 flex-shrink-0 overflow-x-hidden w-full">
+            <div className="flex gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 lg:gap-3 xl:gap-4 w-full max-w-full">
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 min-w-0 px-2 xs:px-3 sm:px-4 md:px-4 lg:px-5 xl:px-6 2xl:px-7 py-1.5 xs:py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 2xl:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg placeholder-gray-400"
                 placeholder={t('type_message')}
               />
               <button
                 onClick={send}
                 disabled={!text.trim()}
-                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-10 py-1.5 xs:py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 2xl:py-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-xl hover:from-primary/90 hover:to-primary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg font-medium text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg flex items-center justify-center flex-shrink-0 min-w-[40px] xs:min-w-[44px] sm:min-w-[60px] md:min-w-[70px] lg:min-w-[85px] xl:min-w-[100px] 2xl:min-w-[120px] touch-manipulation"
+                style={{ minHeight: '40px' }}
               >
-                {t('send')}
+                <span className="hidden sm:inline">{t('send')}</span>
+                <span className="sm:hidden text-base xs:text-lg font-bold">📤</span>
               </button>
             </div>
           </div>

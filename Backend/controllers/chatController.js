@@ -114,7 +114,13 @@ export const getDoctorConversations = async (req, res) => {
       })
     );
 
-    res.json({ success: true, conversations: conversationsWithMessages });
+    // Filter out conversations that have no messages (empty conversations)
+    // Only show conversations that have at least one message
+    const conversationsWithAtLeastOneMessage = conversationsWithMessages.filter(
+      (conv) => conv.lastMessage !== null
+    );
+
+    res.json({ success: true, conversations: conversationsWithAtLeastOneMessage });
   } catch (error) {
     console.error('Get doctor conversations error:', error);
     res.status(500).json({ success: false, message: error.message });

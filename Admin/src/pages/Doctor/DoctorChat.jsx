@@ -14,6 +14,7 @@ const DoctorChat = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const bottomRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const socketRef = useRef(null);
   const doctorIdRef = useRef(null);
 
@@ -72,6 +73,15 @@ const DoctorChat = () => {
 
     socketRef.current = socket;
 
+    // Scroll to bottom function
+    const scrollToBottom = () => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      } else if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
     const loadMessages = async () => {
       try {
         setIsLoadingMessages(true);
@@ -84,6 +94,11 @@ const DoctorChat = () => {
 
         setMessages(data.data || []);
         socket.emit("chat:join", selectedConversation._id);
+        
+        // Scroll to bottom after loading messages
+        setTimeout(() => {
+          scrollToBottom();
+        }, 200);
       } catch (error) {
         console.error("Load messages error:", error);
         toast.error("Failed to load messages");
@@ -113,8 +128,9 @@ const DoctorChat = () => {
         }
         return [...prev, { ...msg, isSending: false }];
       });
+      // Scroll to bottom when new message arrives
       setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        scrollToBottom();
       }, 100);
     });
 
@@ -184,9 +200,12 @@ const DoctorChat = () => {
     };
     setMessages((prev) => [...prev, tempMessage]);
     
+    // Scroll to bottom after adding temp message
     setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      }
+    }, 50);
 
     // Send via socket
     socketRef.current.emit(
@@ -310,67 +329,70 @@ const DoctorChat = () => {
 
   return (
     <MoveUpOnRender id="doctor-chat">
-      <div className="m-5">
-        <h1 className="text-lg font-medium mb-4">Chat with Patients</h1>
+      <div className="m-0 xs:m-1 sm:m-2 md:m-0 lg:m-2 xl:m-3 px-0 xs:px-1 sm:px-2 md:px-0 lg:px-2 xl:px-3 overflow-x-hidden w-full max-w-full">
+        <h1 className="text-base xs:text-lg sm:text-xl md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl font-semibold mb-1 xs:mb-2 sm:mb-3 md:mb-2 lg:mb-3 xl:mb-4 2xl:mb-5 text-gray-800 px-1 xs:px-2 md:px-2">Chat with Patients</h1>
 
-        <div className="bg-white border rounded-lg overflow-hidden" style={{ height: "calc(90vh - 120px)" }}>
-          <div className="flex h-full">
+        <div className="bg-white border border-gray-200 md:border-0 md:rounded-none lg:border lg:rounded-lg overflow-hidden shadow-sm md:shadow-none lg:shadow-sm w-full max-w-full" style={{ height: "calc(90vh - 60px)", maxHeight: "calc(90vh - 60px)" }}>
+          <div className="flex flex-col lg:flex-row h-full w-full max-w-full overflow-hidden">
             {/* Conversations List */}
-            <div className="w-1/3 border-r overflow-y-auto">
-              <div className="p-4 border-b bg-gray-50">
-                <h2 className="font-semibold text-gray-700">Conversations</h2>
+            <div className="w-full lg:w-[40%] xl:w-[45%] 2xl:w-[48%] border-b lg:border-b-0 lg:border-r overflow-y-auto overflow-x-hidden bg-gray-50 flex-shrink-0 min-w-0 max-w-full lg:max-h-full" style={{ maxHeight: "calc(50vh - 60px)" }}>
+              <div className="p-1.5 xs:p-2 sm:p-3 md:p-3 lg:p-4 border-b bg-white sticky top-0 z-10 shadow-sm">
+                <h2 className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-sm md:text-base lg:text-lg">Conversations</h2>
               </div>
               {isLoading ? (
-                <div className="p-4 text-center text-gray-500">
-                  Loading conversations...
+                <div className="p-4 text-center text-gray-500 text-sm">
+                  <div className="animate-pulse">Loading conversations...</div>
                 </div>
               ) : conversations.length === 0 ? (
-                <div className="p-4 text-center text-gray-500">
-                  No conversations yet
+                <div className="p-6 sm:p-8 text-center text-gray-400">
+                  <p className="text-sm sm:text-base">No conversations yet</p>
+                  <p className="text-xs text-gray-400 mt-1">Patients will appear here when they message you</p>
                 </div>
               ) : (
                 <div>
                   {conversations.map((conv) => (
                     <div
                       key={conv._id}
-                      className={`p-4 border-b hover:bg-gray-50 transition-colors ${
+                      className={`p-1.5 xs:p-2 sm:p-2.5 md:p-2.5 lg:p-4 xl:p-5 2xl:p-6 border-b border-gray-200 hover:bg-white transition-all cursor-pointer ${
                         selectedConversation?._id === conv._id
-                          ? "bg-primary/10 border-l-4 border-l-primary"
-                          : ""
+                          ? "bg-primary/5 border-l-4 border-l-primary shadow-sm"
+                          : "bg-gray-50"
                       }`}
                     >
                       <div 
                         onClick={() => setSelectedConversation(conv)}
-                        className="flex items-center gap-3 cursor-pointer"
+                        className="flex items-center gap-1 xs:gap-1.5 sm:gap-2 md:gap-2 lg:gap-3 xl:gap-4 2xl:gap-4 w-full"
                       >
                         <img
                           src={conv.user?.image || "/default-avatar.png"}
                           alt={conv.user?.name}
-                          className="w-12 h-12 rounded-full object-cover"
+                          className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-800 truncate">
+                          <h3 className="font-semibold text-gray-800 truncate lg:truncate-none text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg 2xl:text-xl">
                             {conv.user?.name || "Unknown User"}
                           </h3>
-                          {conv.lastMessage && (
-                            <p className="text-sm text-gray-500 truncate">
+                          {conv.lastMessage ? (
+                            <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-xs lg:text-sm xl:text-base 2xl:text-lg text-gray-600 truncate lg:truncate-none mt-0.5">
                               {conv.lastMessage.text}
                             </p>
+                          ) : (
+                            <p className="text-[9px] xs:text-[10px] text-gray-400 italic truncate lg:truncate-none">No messages yet</p>
                           )}
                         </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Are you sure you want to delete conversation with ${conv.user?.name || "this user"}?`)) {
+                              deleteConversationById(conv._id);
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 flex-shrink-0 transition-colors p-1.5 hover:bg-red-50 rounded ml-auto"
+                          title="Delete conversation"
+                        >
+                          <span className="text-base xs:text-lg">🗑️</span>
+                        </button>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm(`Are you sure you want to delete conversation with ${conv.user?.name || "this user"}?`)) {
-                            deleteConversationById(conv._id);
-                          }
-                        }}
-                        className="mt-2 text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded hover:bg-red-50 transition-colors"
-                        title="Delete conversation"
-                      >
-                        🗑️ Delete
-                      </button>
                     </div>
                   ))}
                 </div>
@@ -378,33 +400,38 @@ const DoctorChat = () => {
             </div>
 
             {/* Chat Window */}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col bg-white min-w-0 overflow-hidden w-full lg:flex-1" style={{ minHeight: "calc(50vh - 60px)", maxHeight: "calc(90vh - 60px)" }}>
               {selectedConversation ? (
                 <>
                   {/* Chat Header */}
-                  <div className="p-4 border-b bg-gray-50 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div className="p-1.5 xs:p-2 sm:p-3 md:p-3 lg:p-4 xl:p-5 border-b bg-gradient-to-r from-gray-50 to-white flex items-center justify-between shadow-sm sticky top-0 z-10 flex-shrink-0 overflow-x-hidden">
+                    <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-2 md:gap-2 lg:gap-2.5 xl:gap-3 min-w-0 flex-1">
                       <img
                         src={selectedUser?.image || "/default-avatar.png"}
                         alt={selectedUser?.name}
-                        className="w-10 h-10 rounded-full"
+                        className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 xl:w-14 xl:h-14 rounded-full border-2 border-white shadow-md object-cover flex-shrink-0"
                       />
-                      <div>
-                        <h3 className="font-semibold">{selectedUser?.name || "Unknown User"}</h3>
-                        <p className="text-sm text-gray-500">Patient</p>
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <h3 className="font-semibold text-gray-800 text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg 2xl:text-xl truncate">{selectedUser?.name || "Unknown User"}</h3>
+                        <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-xs lg:text-sm xl:text-base text-gray-500 truncate">Patient</p>
                       </div>
                     </div>
                     <button
                       onClick={deleteConversation}
-                      className="text-red-500 hover:text-red-700 text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                      className="text-red-500 hover:text-red-700 text-[9px] xs:text-[10px] sm:text-xs md:text-xs lg:text-sm xl:text-base px-1 xs:px-1.5 sm:px-2 md:px-2.5 lg:px-3 xl:px-4 py-0.5 xs:py-1 sm:py-1.5 md:py-1.5 lg:py-2 xl:py-2.5 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-0.5 xs:gap-1 sm:gap-1 md:gap-1.5 border border-red-200 hover:border-red-300 flex-shrink-0"
                       title="Delete conversation"
                     >
-                      🗑️ Delete
+                      <span className="text-[10px] xs:text-xs sm:text-sm">🗑️</span>
+                      <span className="hidden sm:inline text-[10px] xs:text-xs sm:text-sm md:text-xs lg:text-sm xl:text-base">Delete</span>
                     </button>
                   </div>
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  <div 
+                    ref={messagesContainerRef}
+                    className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 xs:p-2 sm:p-3 md:p-3 lg:p-4 xl:p-5 2xl:p-6 space-y-1.5 xs:space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-3 xl:space-y-4 bg-gray-50 min-h-0"
+                    style={{ scrollBehavior: 'smooth' }}
+                  >
                     {isLoadingMessages ? (
                       <div className="text-center text-gray-500">
                         Loading messages...
@@ -424,19 +451,19 @@ const DoctorChat = () => {
                             key={msg._id || Math.random()}
                             className={`flex ${isDoctor ? "justify-end" : "justify-start"} group`}
                           >
-                            <div className={`relative ${isDoctor ? "flex-row-reverse" : "flex-row"} flex items-start gap-2`}>
+                            <div className={`relative ${isDoctor ? "flex-row-reverse" : "flex-row"} flex items-start gap-1 xs:gap-1.5 sm:gap-2 md:gap-2 lg:gap-2.5 xl:gap-3 w-full max-w-full`}>
                               <div
-                                className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                                className={`max-w-[90%] xs:max-w-[88%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%] 2xl:max-w-[65%] rounded-2xl px-2 xs:px-2.5 sm:px-3 md:px-3.5 lg:px-4 xl:px-5 2xl:px-6 py-1.5 xs:py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 shadow-sm break-words ${
                                   isDoctor
-                                    ? "bg-primary text-white"
-                                    : "bg-gray-100 text-gray-800"
+                                    ? "bg-gradient-to-br from-primary to-primary/90 text-white rounded-br-sm"
+                                    : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm"
                                 }`}
                               >
-                                <p className="text-sm">{msg.text}</p>
+                                <p className="text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere">{msg.text}</p>
                                 {msg.createdAt && (
                                   <p
-                                    className={`text-xs mt-1 ${
-                                      isDoctor ? "text-white/70" : "text-gray-500"
+                                    className={`text-[9px] xs:text-[10px] sm:text-xs mt-0.5 xs:mt-1 sm:mt-1.5 md:mt-1.5 lg:mt-2 ${
+                                      isDoctor ? "text-white/80" : "text-gray-500"
                                     }`}
                                   >
                                     {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -464,28 +491,33 @@ const DoctorChat = () => {
                   </div>
 
                   {/* Message Input */}
-                  <div className="border-t p-4 bg-gray-50">
-                    <div className="flex gap-2">
+                  <div className="border-t-2 border-gray-200 px-1.5 xs:px-2 sm:px-3 md:px-3 lg:px-4 xl:px-5 py-1.5 xs:py-2 sm:py-3 md:py-3 lg:py-4 xl:py-5 bg-white shadow-lg sticky bottom-0 z-10 flex-shrink-0 overflow-x-hidden w-full">
+                    <div className="flex gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 lg:gap-3 xl:gap-4 w-full max-w-full">
                       <input
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="flex-1 min-w-0 px-2 xs:px-3 sm:px-4 md:px-4 lg:px-5 xl:px-6 2xl:px-7 py-1.5 xs:py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 2xl:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg placeholder-gray-400"
                         placeholder="Type your message..."
                       />
                       <button
                         onClick={sendMessage}
                         disabled={!text.trim()}
-                        className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-10 py-1.5 xs:py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 2xl:py-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-xl hover:from-primary/90 hover:to-primary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg font-medium text-[11px] xs:text-xs sm:text-sm md:text-sm lg:text-base xl:text-lg flex items-center justify-center flex-shrink-0 min-w-[40px] xs:min-w-[44px] sm:min-w-[60px] md:min-w-[70px] lg:min-w-[85px] xl:min-w-[100px] 2xl:min-w-[120px] touch-manipulation"
+                        style={{ minHeight: '40px' }}
                       >
-                        Send
+                        <span className="hidden sm:inline">Send</span>
+                        <span className="sm:hidden text-base xs:text-lg font-bold">📤</span>
                       </button>
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-500">
-                  <p>Select a conversation to start chatting</p>
+                <div className="flex-1 flex items-center justify-center text-gray-400 bg-gray-50">
+                  <div className="text-center">
+                    <p className="text-sm sm:text-base mb-2">Select a conversation to start chatting</p>
+                    <p className="text-xs text-gray-400">Choose a patient from the list to begin</p>
+                  </div>
                 </div>
               )}
             </div>

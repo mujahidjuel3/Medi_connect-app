@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import { AppContext } from "../context/AppContext";
+import { User } from "lucide-react";
 const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
@@ -104,6 +105,15 @@ const Navbar = () => {
           </div>
         ) : (
           <>
+            {/* User profile icon for mobile screen when not logged in */}
+            <button
+              onClick={() => navigate("/login")}
+              className="sm:hidden flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex-shrink-0"
+              title={t('login')}
+            >
+              <User className="w-5 h-5 xs:w-6 xs:h-6 text-gray-600" />
+            </button>
+            {/* Create Account button for desktop screen */}
             <button
               onClick={() => navigate("/login")}
               className="bg-primary text-white px-4 sm:px-6 md:px-8 py-1.5 sm:py-2 md:py-3 rounded-full font-light text-xs sm:text-sm md:text-base hidden sm:block"
