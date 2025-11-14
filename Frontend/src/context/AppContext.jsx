@@ -36,10 +36,25 @@ const AppContextProvider = (props) => {
       if (data.success) {
         setUserData(data.userData);
       } else {
+        // Handle JWT errors silently - clear token if malformed or invalid
+        if (data.message && (data.message.toLowerCase().includes('jwt') || data.message.toLowerCase().includes('malformed') || data.message.toLowerCase().includes('unauthorized'))) {
+          localStorage.removeItem("token");
+          setToken("");
+          setUserData(false);
+          return;
+        }
         toast.error(data.message);
       }
     } catch (error) {
       console.log("error:", error);
+      // Handle JWT errors silently - clear token if malformed or invalid
+      const errorMessage = error.response?.data?.message || error.message || "";
+      if (errorMessage.toLowerCase().includes('jwt') || errorMessage.toLowerCase().includes('malformed') || errorMessage.toLowerCase().includes('unauthorized')) {
+        localStorage.removeItem("token");
+        setToken("");
+        setUserData(false);
+        return;
+      }
       toast.error(error.message);
     }
   };
@@ -74,6 +89,17 @@ const AppContextProvider = (props) => {
         return config;
       },
       (error) => {
+        setIsLoading(false);
+        // Handle JWT errors globally - clear token if malformed or invalid
+        const errorMessage = error.response?.data?.message || error.message || "";
+        if (errorMessage.toLowerCase().includes('jwt') || errorMessage.toLowerCase().includes('malformed') || errorMessage.toLowerCase().includes('unauthorized') || errorMessage.toLowerCase().includes('not authorized')) {
+          // Clear invalid token
+          localStorage.removeItem("token");
+          setToken("");
+          setUserData(false);
+          // Don't show error toast for JWT errors - they're handled silently
+          return Promise.reject(error);
+        }
         return Promise.reject(error);
       }
     );
