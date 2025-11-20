@@ -6,7 +6,7 @@ services:
   - type: web
     name: mediconnect-backend
     env: node
-    nodeVersion: 22
+    nodeVersion: 18
     region: singapore
     plan: free
     buildCommand: npm install
