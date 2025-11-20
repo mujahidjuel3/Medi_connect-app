@@ -2,10 +2,16 @@
 Backend/nul
 nul
 
-# Environment files
+# Environment files - NEVER commit these!
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
+**/.env
+**/.env.local
+**/.env.*.local
 
 # Dependencies
 node_modules/
